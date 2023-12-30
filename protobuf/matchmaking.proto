@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package = "pkg/protos";
+
+message MatchmakingFind {
+    string user_id = 1;
+}
+
+message MatchmakingFound {
+    string user_id = 1;
+    string match_id = 2;
+}
+
+message MatchmakingCancel {
+    string user_id = 1;
+}

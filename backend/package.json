@@ -1,0 +1,27 @@
+{
+  "name": "soulwars-backend",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch run src/index.ts",
+    "proto:generate": "protoc --ts_proto_out=./src/protos --proto_path=../soulwars-protobuf/ ../soulwars-protobuf/matchmaking.proto"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.4",
+    "bun-types": "latest",
+    "prettier": "^3.1.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.4.0-pre.5",
+    "amqplib": "^0.10.3",
+    "drizzle-orm": "^0.29.2",
+    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
+    "ts-proto": "^1.165.3",
+    "zod": "^3.22.4"
+  }
+}

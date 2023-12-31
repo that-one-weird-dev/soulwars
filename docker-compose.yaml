@@ -1,0 +1,44 @@
+services:
+    # web:
+    #     build:
+    #         context: web
+    #         dockerfile: Dockerfile.dev
+    #     env_file:
+    #         - .env
+    #     environment:
+    #         - PUBLIC_BACKEND_ADDRESS="soulwars.up.railway.app"
+    #     ports:
+    #         - 5173:5173
+    #     volumes:
+    #         - ./web:/app
+    #         - /app/node_modules
+    backend:
+        build:
+            context: backend
+            dockerfile: Dockerfile.dev
+        env_file:
+            - .env
+        environment:
+            - CORS_ORIGIN="http://localhost:5173"
+            - RABBIT_URL=amqp://rabbit
+        ports:
+            - 443:443
+        volumes:
+            - ./backend:/app
+            - /app/node_modules
+    matchmaking:
+        build:
+            context: matchmaking
+            dockerfile: Dockerfile.dev
+        env_file:
+            - .env
+        environment:
+            - RABBIT_URL=amqp://rabbit
+    rabbit:
+        image: rabbitmq
+        ports:
+            - 5672:5672
+            - 15672:15672
+        volumes:
+            - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+            - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq/

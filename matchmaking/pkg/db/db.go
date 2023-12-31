@@ -15,11 +15,11 @@ var Conn *gorm.DB
 func Init() error {
     var err error
 
-    db_url := os.Getenv("DATABASE_URL")
+    db_url := os.Getenv("DATABASE_MATCHMAKING_URL")
     if db_url == "" {
 	return errors.New("No database url")
     }
-    auth_token := os.Getenv("DATABASE_AUTH_TOKEN")
+    auth_token := os.Getenv("DATABASE_MATCHMAKING_AUTH_TOKEN")
     if auth_token == "" {
 	return errors.New("No database auth token")
     }

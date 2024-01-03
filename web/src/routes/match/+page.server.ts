@@ -4,7 +4,7 @@ import type { PageServerLoad } from "./$types";
 import { decks } from "$lib/server/schema";
 import { fail } from "@sveltejs/kit";
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, cookies }) => {
     const session = await locals.getSession();
     if (!session?.user?.id) {
         throw fail(400);
@@ -16,5 +16,6 @@ export const load: PageServerLoad = async ({ locals }) => {
 
     return {
         decks: deckList,
+        sessionToken: cookies.get("authjs.session-token")!,
     };
 };

@@ -55,11 +55,11 @@ func handleFind(request *protos.MatchmakingFind, replyTo string) error {
 	} else {
 		matchmaking.SetMatchOngoing(match, request.UserId, replyTo)
 
-		err := publishMatchFound(match.UserID, match.ReplyTo)
+		err := publishMatchFound(match.UserID, match.ReplyTo, match.GameID.String())
 		if err != nil {
 			return err
 		}
 
-		return publishMatchFound(match.User2ID, match.ReplyTo2)
+		return publishMatchFound(match.User2ID, match.ReplyTo2, match.GameID.String())
 	}
 }

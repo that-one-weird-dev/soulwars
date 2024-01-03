@@ -1,3 +1,5 @@
+version: "3"
+
 services:
     # web:
     #     build:
@@ -19,13 +21,17 @@ services:
         env_file:
             - .env
         environment:
-            - CORS_ORIGIN="http://localhost:5173"
+            - CORS_ORIGIN=*
             - RABBIT_URL=amqp://rabbit
+            - PORT=3000
         ports:
-            - 443:443
+            - 3000:3000
         volumes:
             - ./backend:/app
             - /app/node_modules
+        depends_on:
+            rabbit:
+                condition: service_healthy
     matchmaking:
         build:
             context: matchmaking
@@ -34,6 +40,9 @@ services:
             - .env
         environment:
             - RABBIT_URL=amqp://rabbit
+        depends_on:
+            rabbit:
+                condition: service_healthy
     rabbit:
         image: rabbitmq
         ports:
@@ -42,3 +51,9 @@ services:
         volumes:
             - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
             - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq/
+        healthcheck:
+              test: rabbitmq-diagnostics -q ping
+              interval: 5s
+              timeout: 10s
+              retries: 5
+

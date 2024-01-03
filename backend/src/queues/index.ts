@@ -29,11 +29,12 @@ channel.consume(
     (message) => {
         if (!message) return;
 
-        console.log("match found");
-
         const request = MatchmakingFound.decode(
             Uint8Array.from(message.content),
         );
+
+        console.log(`match found with id: ${request.matchId}`);
+
         const callback = userCallbackMap.get(request.userId);
 
         callback?.(request.matchId);

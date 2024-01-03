@@ -11,12 +11,12 @@ import (
 	"soulwars-matchmaking/pkg/protos"
 )
 
-func publishMatchFound(userId string, replyTo string) error {
+func publishMatchFound(userId, replyTo, matchId string) error {
 	log.Println(" [*] Sending match found on queue " + replyTo)
 
 	response := &protos.MatchmakingFound{
 		UserId:  userId,
-		MatchId: "",
+		MatchId: matchId,
 	}
 
 	responseBytes, err := proto.Marshal(response)

@@ -1,19 +1,19 @@
 version: "3"
 
 services:
-    # web:
-    #     build:
-    #         context: web
-    #         dockerfile: Dockerfile.dev
-    #     env_file:
-    #         - .env
-    #     environment:
-    #         - PUBLIC_BACKEND_ADDRESS="soulwars.up.railway.app"
-    #     ports:
-    #         - 5173:5173
-    #     volumes:
-    #         - ./web:/app
-    #         - /app/node_modules
+    web:
+        build:
+            context: web
+            dockerfile: Dockerfile.dev
+        env_file:
+            - .env
+        environment:
+            - PUBLIC_BACKEND_ADDRESS=ws://localhost:3000
+        ports:
+            - 5173:5173
+        volumes:
+            - ./web:/app
+            - /app/node_modules
     backend:
         build:
             context: backend

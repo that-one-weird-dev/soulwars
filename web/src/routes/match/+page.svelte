@@ -5,9 +5,10 @@
 
     export let data: PageData;
 
+    let currentState: "awaiting" | "searching" | "found" = "awaiting";
     let matchId: string | undefined = undefined;
 
-    const socket = io(`${PUBLIC_BACKEND_ADDRESS}`, {
+    const socket = io(PUBLIC_BACKEND_ADDRESS, {
         transports: ["websocket"],
         auth: {
             sessionToken: data.sessionToken,
@@ -15,12 +16,15 @@
     });
 
     async function connect() {
+        currentState = "searching";
         const matchInfo = await socket.emitWithAck("match:find");
         matchId = matchInfo.matchId;
+        currentState = "found";
     }
 </script>
 
-<button class="btn variant-filled" on:click={connect}>Find match</button>
-{#if matchId}
+<button class="btn variant-filled" on:click={connect} disabled={currentState !== "awaiting"}>Find match</button>
+
+{#if currentState === "found"}
     <span>Match found with game id {matchId}</span>
 {/if}

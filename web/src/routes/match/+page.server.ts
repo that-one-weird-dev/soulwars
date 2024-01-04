@@ -14,8 +14,10 @@ export const load: PageServerLoad = async ({ locals, cookies }) => {
         where: eq(decks.userId, session.user.id),
     });
 
+    const sessionCookieName = process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token";
+
     return {
         decks: deckList,
-        sessionToken: cookies.get("authjs.session-token")!,
+        sessionToken: cookies.get(sessionCookieName)!,
     };
 };

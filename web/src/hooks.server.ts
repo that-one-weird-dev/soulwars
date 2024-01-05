@@ -7,8 +7,25 @@ import {
 } from "$env/static/private";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "$lib/server/database";
+import { redirect, type Handle } from "@sveltejs/kit";
+import { sequence } from "@sveltejs/kit/hooks";
 
-export const handle = SvelteKitAuth({
+export const protectedRoutes = ["/decks", "/match"];
+
+const authorization: Handle = async ({ event, resolve }) => {
+    for (const route of protectedRoutes) {
+        if (event.url.pathname.startsWith(route)) {
+            const session = await event.locals.getSession();
+            if (!session) {
+                throw redirect(303, "/");
+            }
+        }
+    }
+
+    return resolve(event);
+};
+
+const auth = SvelteKitAuth({
     adapter: DrizzleAdapter(db),
     providers: [
         Discord({
@@ -22,7 +39,7 @@ export const handle = SvelteKitAuth({
     },
     callbacks: {
         session: async (params) => {
-            if ('user' in params && params.session.user) {
+            if ("user" in params && params.session.user) {
                 params.session.user.id = params.user.id;
             }
 
@@ -30,3 +47,5 @@ export const handle = SvelteKitAuth({
         },
     },
 });
+
+export const handle = sequence(auth, authorization);

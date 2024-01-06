@@ -11,6 +11,7 @@ export type ClientToServerEvents = {
 
 export type ServerToClientEvents = {
     "match:found": () => void;
+    "match:ready": () => void;
 };
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents, {}, SocketData>;

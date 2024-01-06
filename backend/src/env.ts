@@ -10,5 +10,6 @@ export const env = z
         CORS_ORIGIN: z.string().min(1),
 
         RABBIT_URL: z.string().min(1),
+        GAME_SERVER_URL: z.string().min(1),
     })
     .parse(process.env);

@@ -15,6 +15,11 @@
         },
     });
 
+    socket.on("match:ready", async () => {
+        console.log("match ready");
+        console.log(await socket.emitWithAck("info:hand", "test"));
+    })
+
     async function connect() {
         currentState = "searching";
         const matchInfo = await socket.emitWithAck("match:find");

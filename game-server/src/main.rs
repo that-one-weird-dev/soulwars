@@ -1,9 +1,10 @@
 use socketioxide::SocketIo;
+use state::game_state::GameState;
 use tracing_subscriber::FmtSubscriber;
-use user_state::UserState;
 
 mod handlers;
-mod user_state;
+mod state;
+mod game;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -12,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing::subscriber::set_global_default(subscriber)?;
 
     let (layer, io) = SocketIo::builder()
-        .with_state(UserState::default())
+        .with_state(GameState::default())
         .build_layer();
 
     io.ns("/", handlers::connection::handle_connection);

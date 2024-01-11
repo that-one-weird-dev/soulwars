@@ -4,7 +4,6 @@ use tracing_subscriber::FmtSubscriber;
 
 mod handlers;
 mod state;
-mod game;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

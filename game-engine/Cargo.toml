@@ -1,0 +1,9 @@
+[package]
+name = "game_engine"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.79"
+mlua = { version = "0.9.3", features = ["lua54"] }
+uuid = "1.6.1"

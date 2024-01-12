@@ -9,40 +9,40 @@ macro_rules! add_card_field {
     };
 }
 
-pub enum SpellKind {
+pub enum EnchantmentKind {
     Normal,
     Blessing,
     Curse,
 }
 
-impl SpellKind {
+impl EnchantmentKind {
     fn as_str(&self) -> &'static str {
         match self {
-            SpellKind::Normal => "normal",
-            SpellKind::Blessing => "blessing",
-            SpellKind::Curse => "curse",
+            EnchantmentKind::Normal => "normal",
+            EnchantmentKind::Blessing => "blessing",
+            EnchantmentKind::Curse => "curse",
         }
     }
 }
 
-impl Into<String> for SpellKind {
+impl Into<String> for EnchantmentKind {
     fn into(self) -> String {
         match self {
-            SpellKind::Normal => "normal",
-            SpellKind::Blessing => "blessing",
-            SpellKind::Curse => "curse",
+            EnchantmentKind::Normal => "normal",
+            EnchantmentKind::Blessing => "blessing",
+            EnchantmentKind::Curse => "curse",
         }
         .to_string()
     }
 }
 
-impl From<&String> for SpellKind {
+impl From<&String> for EnchantmentKind {
     fn from(value: &String) -> Self {
         match value.as_str() {
-            "normal" => SpellKind::Normal,
-            "blessing" => SpellKind::Blessing,
-            "curse" => SpellKind::Curse,
-            _ => SpellKind::Normal,
+            "normal" => EnchantmentKind::Normal,
+            "blessing" => EnchantmentKind::Blessing,
+            "curse" => EnchantmentKind::Curse,
+            _ => EnchantmentKind::Normal,
         }
     }
 }
@@ -55,9 +55,28 @@ pub enum Card {
     },
     Artifact {},
     Terrain {},
-    Spell {
-        kind: SpellKind,
+    Enchantment {
+        kind: EnchantmentKind,
     },
+}
+
+impl Card {
+    pub fn yokai(max_health: i64, health: i64, damage: i64) -> Self {
+        Self::Yokai {
+            max_health,
+            health,
+            damage,
+        }
+    }
+    pub fn artifact() -> Self {
+        Self::Artifact {}
+    }
+    pub fn terrain() -> Self {
+        Self::Terrain {}
+    }
+    pub fn enchantment(kind: EnchantmentKind) -> Self {
+        Self::Enchantment { kind }
+    }
 }
 
 impl UserData for Card {
@@ -67,7 +86,7 @@ impl UserData for Card {
         add_card_field!(fields, Yokai, health, *health);
         add_card_field!(fields, Yokai, damage, *damage);
 
-        // Spell
-        add_card_field!(fields, Spell, kind, kind.as_str());
+        // Enchantment
+        add_card_field!(fields, Enchantment, kind, kind.as_str());
     }
 }

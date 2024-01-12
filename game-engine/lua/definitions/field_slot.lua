@@ -7,5 +7,5 @@
 ---| "artifact-1"
 ---| "artifact-2"
 ---| "artifact-3"
----| "graveyard"
+---| "artifact"
 ---| "terrain"

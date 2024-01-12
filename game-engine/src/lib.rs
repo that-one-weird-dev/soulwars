@@ -1,7 +1,9 @@
 pub mod card_type;
 pub mod engine;
-mod game;
-mod card_wrapper;
-mod player;
-mod field;
-mod card;
+pub mod event_handler;
+pub mod card_wrapper;
+pub mod game;
+pub mod player;
+pub mod field;
+pub mod card;
+pub mod field_slot;

@@ -5,8 +5,8 @@ local card = {}
 
 function card:activate(player)
 
-	player:select_slot(function()
-		player:draw()
+	player:select_slot(function(slot)
+		player:summon(slot, self.id)
 	end)
 end
 

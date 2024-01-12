@@ -1,44 +1,42 @@
-use crate::card_type::CardType;
+use crate::{card_type::CardType, field_slot::FieldSlot};
 
 
 #[derive(Default)]
 pub struct Field {
-    yokai_1: Option<CardType>,
-    yokai_2: Option<CardType>,
-    yokai_3: Option<CardType>,
-    artifact_1: Option<CardType>,
-    artifact_2: Option<CardType>,
-    artifact_3: Option<CardType>,
-    terrain: Option<CardType>,
-    spell: Option<CardType>,
+    pub yokai_1: Option<CardType>,
+    pub yokai_2: Option<CardType>,
+    pub yokai_3: Option<CardType>,
+    pub artifact_1: Option<CardType>,
+    pub artifact_2: Option<CardType>,
+    pub artifact_3: Option<CardType>,
+    pub terrain: Option<CardType>,
+    pub enchantment: Option<CardType>,
 }
 
 impl Field {
-    pub fn get(&self, slot: String) -> mlua::Result<&Option<CardType>> {
-        match slot.as_str() {
-            "yokai-1" => Ok(&self.yokai_1),
-            "yokai-2" => Ok(&self.yokai_2),
-            "yokai-3" => Ok(&self.yokai_3),
-            "artifact-1" => Ok(&self.artifact_1),
-            "artifact-2" => Ok(&self.artifact_2),
-            "artifact-3" => Ok(&self.artifact_3),
-            "terrain" => Ok(&self.terrain),
-            "spell" => Ok(&self.spell),
-            _ => Err(mlua::Error::runtime("Invalid slot")),
+    pub fn get(&self, slot: FieldSlot) -> mlua::Result<&Option<CardType>> {
+        match slot {
+            FieldSlot::Yokai1 => Ok(&self.yokai_1),
+            FieldSlot::Yokai2 => Ok(&self.yokai_2),
+            FieldSlot::Yokai3 => Ok(&self.yokai_3),
+            FieldSlot::Artifact1 => Ok(&self.artifact_1),
+            FieldSlot::Artifact2 => Ok(&self.artifact_2),
+            FieldSlot::Artifact3 => Ok(&self.artifact_3),
+            FieldSlot::Terrain => Ok(&self.terrain),
+            FieldSlot::Enchantment => Ok(&self.enchantment),
         }
     }
 
-    pub fn set(&mut self, slot: String, card: Option<CardType>) -> mlua::Result<()> {
-        match slot.as_str() {
-            "yokai-1" => self.yokai_1 = card,
-            "yokai-2" => self.yokai_2 = card,
-            "yokai-3" => self.yokai_3 = card,
-            "artifact-1" => self.artifact_1 = card,
-            "artifact-2" => self.artifact_2 = card,
-            "artifact-3" => self.artifact_3 = card,
-            "terrain" => self.terrain = card,
-            "spell" => self.terrain = card,
-            _ => return Err(mlua::Error::runtime("Invalid slot")),
+    pub fn set(&mut self, slot: FieldSlot, card: Option<CardType>) -> mlua::Result<()> {
+        match slot {
+            FieldSlot::Yokai1 => self.yokai_1 = card,
+            FieldSlot::Yokai2 => self.yokai_2 = card,
+            FieldSlot::Yokai3 => self.yokai_3 = card,
+            FieldSlot::Artifact1 => self.artifact_1 = card,
+            FieldSlot::Artifact2 => self.artifact_2 = card,
+            FieldSlot::Artifact3 => self.artifact_3 = card,
+            FieldSlot::Terrain => self.terrain = card,
+            FieldSlot::Enchantment => self.terrain = card,
         };
 
         Ok(())

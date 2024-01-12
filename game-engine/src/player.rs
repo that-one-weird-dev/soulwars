@@ -2,7 +2,7 @@ use std::cell::RefCell;
 
 use mlua::{Function, UserData};
 
-use crate::{card_type::CardType, field::Field};
+use crate::{card_type::CardType, field::Field, field_slot::FieldSlot};
 
 pub struct Player {
     pub id: usize,
@@ -39,7 +39,7 @@ impl UserData for Player {
             Ok(())
         });
 
-        methods.add_method::<_, (String, CardType), _>("summon", |_, this, (slot, card_type)| {
+        methods.add_method::<_, (FieldSlot, CardType), _>("summon", |_, this, (slot, card_type)| {
             let mut field = this.field.borrow_mut();
 
             field.set(slot, Some(card_type))?;
@@ -48,7 +48,7 @@ impl UserData for Player {
         });
 
         methods.add_method::<_, Function, _>("select_slot", |_, _, callback| {
-            callback.call("yokai-2")?;
+            callback.call("yokai-1")?;
 
             Ok(())
         });

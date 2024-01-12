@@ -1,6 +1,6 @@
 ---@meta
 
----@alias SpellKind
+---@alias EnchantmentKind
 ---| "normal"
 ---| "blessing"
 ---| "curse"
@@ -10,8 +10,9 @@
 ---@field health integer
 ---@field damage integer
 
----@class SpellData
----@field kind SpellKind
+---@class EnchantmentData
+---@field kind EnchantmentKind
 
 ---@class Card
+---@field id integer
 ---@field activate fun(self, player: Player)?

@@ -1,12 +1,12 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use mlua::UserData;
 
 use crate::player::Player;
 
 pub struct Game {
-    pub player1: Arc<Player>,
-    pub player2: Arc<Player>,
+    pub player1: Rc<Player>,
+    pub player2: Rc<Player>,
 }
 
 impl UserData for Game {
@@ -22,8 +22,8 @@ impl UserData for Game {
 impl Game {
     pub fn new(player1: Player, player2: Player) -> Self {
         Self {
-            player1: Arc::new(player1),
-            player2: Arc::new(player2),
+            player1: Rc::new(player1),
+            player2: Rc::new(player2),
         }
     }
 }

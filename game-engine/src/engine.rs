@@ -1,11 +1,11 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use mlua::Lua;
 
 use crate::{card::Card, card_wrapper::CardWrapper, game::Game};
 
 pub struct GameEngine {
-    pub game: Arc<Game>,
+    pub game: Rc<Game>,
 
     lua: Lua,
 }
@@ -14,7 +14,7 @@ impl GameEngine {
     pub fn new(game: Game) -> anyhow::Result<Self> {
         let lua = Lua::new();
 
-        let game = Arc::new(game);
+        let game = Rc::new(game);
 
         lua.globals().set("game", game.clone())?;
 

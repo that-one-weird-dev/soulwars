@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::rc::Rc;
 
 use crate::{card::Card, player::Player};
 
@@ -18,7 +18,7 @@ impl<'a> CardWrapper<'a> {
         Ok(Self { table: card_table })
     }
 
-    pub fn activate(&self, player: Arc<Player>) -> anyhow::Result<()> {
+    pub fn activate(&self, player: Rc<Player>) -> anyhow::Result<()> {
         let activate = self.table.get::<_, mlua::Function>("activate")?;
 
         Ok(activate.call((self.table.clone(), player))?)

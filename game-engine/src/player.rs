@@ -1,20 +1,26 @@
-use std::cell::RefCell;
+use std::{cell::RefCell, rc::Rc};
 
 use mlua::{Function, UserData};
 
-use crate::{card_type::CardType, field::Field, field_slot::FieldSlot};
+use crate::{
+    card_type::CardType, event_handler::EventHandler, field::Field,
+    field_slot::FieldSlot,
+};
 
 pub struct Player {
     pub id: usize,
     pub hand: RefCell<Vec<CardType>>,
     pub deck: RefCell<Vec<CardType>>,
     pub field: RefCell<Field>,
+
+    pub event_handler: Rc<EventHandler>,
 }
 
 impl Player {
-    pub fn new(id: usize, deck: Vec<CardType>) -> Self {
+    pub fn new(id: usize, event_handler: Rc<EventHandler>, deck: Vec<CardType>) -> Self {
         Self {
             id,
+            event_handler,
             hand: RefCell::new(Vec::new()),
             deck: RefCell::new(deck),
             field: RefCell::new(Field::default()),
@@ -39,16 +45,20 @@ impl UserData for Player {
             Ok(())
         });
 
-        methods.add_method::<_, (FieldSlot, CardType), _>("summon", |_, this, (slot, card_type)| {
-            let mut field = this.field.borrow_mut();
+        methods.add_method::<_, (FieldSlot, CardType), _>(
+            "summon",
+            |_, this, (slot, card_type)| {
+                let mut field = this.field.borrow_mut();
 
-            field.set(slot, Some(card_type))?;
+                field.set(slot, Some(card_type))?;
 
-            Ok(card_type)
-        });
+                Ok(card_type)
+            },
+        );
 
-        methods.add_method::<_, Function, _>("select_slot", |_, _, callback| {
-            callback.call("yokai-1")?;
+        methods.add_method::<_, Function, _>("select_slot", |_, this, callback| {
+            let slot = (this.event_handler.select_slot)(&this, ());
+            callback.call::<FieldSlot, _>(slot)?;
 
             Ok(())
         });

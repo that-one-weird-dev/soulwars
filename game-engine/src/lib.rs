@@ -8,3 +8,4 @@ pub mod card_data;
 pub mod field_slot;
 pub mod card;
 pub mod card_script;
+pub mod card_storage;

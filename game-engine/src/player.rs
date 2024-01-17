@@ -1,10 +1,14 @@
-use std::{cell::RefCell, rc::Rc};
+use std::{
+    borrow::{Borrow, BorrowMut},
+    cell::RefCell,
+    rc::Rc,
+};
 
 use mlua::{Function, UserData};
 
 use crate::{
-    card_type::CardType, event_handler::EventHandler, field::Field,
-    field_slot::FieldSlot, card::Card,
+    card::Card, card_storage::CardStorage, card_type::CardType, event_handler::EventHandler,
+    field::Field, field_slot::FieldSlot,
 };
 
 pub struct Player {
@@ -13,14 +17,21 @@ pub struct Player {
     pub deck: RefCell<Vec<CardType>>,
     pub field: RefCell<Field>,
 
-    pub event_handler: Rc<EventHandler>,
+    event_handler: Rc<EventHandler>,
+    card_storage: Rc<CardStorage>,
 }
 
 impl Player {
-    pub fn new(id: usize, event_handler: Rc<EventHandler>, deck: Vec<CardType>) -> Self {
+    pub fn new(
+        id: usize,
+        event_handler: Rc<EventHandler>,
+        card_storage: Rc<CardStorage>,
+        deck: Vec<CardType>,
+    ) -> Self {
         Self {
             id,
             event_handler,
+            card_storage,
             hand: RefCell::new(Vec::new()),
             deck: RefCell::new(deck),
             field: RefCell::new(Field::default()),
@@ -30,6 +41,28 @@ impl Player {
     pub fn add_card_to_hand(&self, card: Card) {
         self.hand.borrow_mut().push(card);
     }
+
+    pub fn draw(&self) -> mlua::Result<()> {
+        let card_type = self
+            .deck
+            .borrow_mut()
+            .pop()
+            .ok_or(mlua::Error::RuntimeError("No more cards".into()))?;
+
+        let card = self.card_storage.create(card_type)?;
+        self.hand.borrow_mut().push(card);
+
+        Ok(())
+    }
+
+    pub fn pop_from_hand(&self, index: usize) -> mlua::Result<Card> {
+        let mut hand = self.hand.borrow_mut();
+        if hand.len() <= index {
+            return Err(mlua::Error::runtime("Invalid hand index"));
+        }
+
+        Ok(hand.remove(index))
+    }
 }
 
 impl UserData for Player {
@@ -38,16 +71,7 @@ impl UserData for Player {
     }
 
     fn add_methods<'lua, M: mlua::prelude::LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // methods.add_method("draw", |_, this, ()| {
-        //     let card = this
-        //         .deck
-        //         .borrow_mut()
-        //         .pop()
-        //         .ok_or(mlua::Error::RuntimeError("No more cards".into()))?;
-        //     this.hand.borrow_mut().push(card);
-        //
-        //     Ok(())
-        // });
+        methods.add_method("draw", |_, this, ()| this.draw());
 
         methods.add_method::<_, (FieldSlot, CardType), _>(
             "summon",

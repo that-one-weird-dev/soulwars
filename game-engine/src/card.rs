@@ -4,9 +4,10 @@ use mlua::UserData;
 
 use crate::card_data::CardData;
 
+#[derive(Clone)]
 pub struct Card {
-    id: i64,
-    data: Rc<CardData>,
+    pub id: i64,
+    pub data: Rc<CardData>,
 }
 
 impl Card {

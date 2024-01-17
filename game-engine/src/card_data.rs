@@ -9,6 +9,7 @@ macro_rules! add_card_field {
     };
 }
 
+#[derive(Clone)]
 pub enum EnchantmentKind {
     Normal,
     Blessing,
@@ -47,6 +48,7 @@ impl From<&String> for EnchantmentKind {
     }
 }
 
+#[derive(Clone)]
 pub enum CardData {
     Yokai {
         max_health: i64,

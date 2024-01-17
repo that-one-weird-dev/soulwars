@@ -1,10 +1,9 @@
 use std::rc::Rc;
 
-use mlua::Lua;
+use mlua::{AsChunk, Lua, Table};
 
 use crate::{
-    card::Card, card_type::CardType, card_wrapper::CardWrapper, event_handler::EventHandler,
-    game::Game,
+    card_script::CardScript, card_type::CardType, event_handler::EventHandler, game::Game,
 };
 
 pub struct GameEngine {
@@ -26,20 +25,50 @@ impl GameEngine {
         let lua = Lua::new();
         lua.globals().set("game", game.clone())?;
 
-        Ok(Self { game, lua })
+        lua.load(
+            r#"
+        __cards = {}
+
+        function create_card(id, card)
+            __cards[id] = card
+        end
+
+        function get_card(id)
+            return __cards[id]
+        end
+        "#,
+        )
+        .set_name("engine")
+        .exec()?;
+
+        let engine = Self { game, lua };
+
+        Ok(engine)
     }
 
-    pub fn load_card(&self, source: String, card: Card, id: i64) -> anyhow::Result<CardWrapper> {
-        let table = self.lua.load(source).eval::<mlua::Table>()?;
+    pub fn load_script<'a>(
+        &'a self,
+        name: impl Into<String>,
+        source: impl AsChunk<'a, 'a>,
+    ) -> mlua::Result<()> {
+        self.lua.load(source).set_name(name).exec()
+    }
 
-        Ok(CardWrapper::create_card(table, card, id)?)
+    pub fn get_card_script(&self, id: i64) -> mlua::Result<CardScript> {
+        let cards = self.lua.globals().get::<_, Table>("__cards")?;
+        let card_table = cards.get::<_, Table>(id)?;
+
+        Ok(CardScript::new(card_table))
     }
 }
 
 #[cfg(test)]
 mod test {
+    use std::{cell::RefCell, rc::Rc};
+
     use crate::{
-        card::{Card, EnchantmentKind},
+        card::Card,
+        card_data::{CardData, EnchantmentKind},
         event_handler::EventHandler,
         field_slot::FieldSlot,
     };
@@ -47,52 +76,30 @@ mod test {
     use super::GameEngine;
 
     #[test]
-    fn should_draw_when_activated() -> anyhow::Result<()> {
-        let engine = GameEngine::new(EventHandler::default(), vec![9], Vec::new())?;
-        let card = engine.load_card(
-            r"
-        return {
-            activate = function(self, player)
-                player:draw()
-            end,
-        }
-        "
-            .to_string(),
-            Card::enchantment(EnchantmentKind::Normal),
-            1,
-        )?;
-
-        card.activate(engine.game.player1.clone())?;
-
-        assert!(matches!(engine.game.player1.hand.borrow().last(), Some(9)));
-
-        Ok(())
-    }
-
-    #[test]
     fn should_summon_when_activated() -> anyhow::Result<()> {
         let event_handler = EventHandler {
-            select_slot: |_, ()| FieldSlot::Yokai2,
+            select_slot: Box::new(|_, ()| Ok(FieldSlot::Yokai2)),
             ..Default::default()
         };
 
         let engine = GameEngine::new(event_handler, vec![9], Vec::new())?;
-        let card = engine.load_card(
+        engine.load_script(
+            "test",
             r"
-        return {
+        create_card(1, {
             activate = function(self, player)
                 player:select_slot(function(slot)
                     player:summon(slot, self.id)
                 end)
             end,
-        }
-        "
-            .to_string(),
-            Card::enchantment(EnchantmentKind::Normal),
-            1,
+        })
+        ",
         )?;
 
-        card.activate(engine.game.player1.clone())?;
+        let card = Card::new(1, CardData::enchantment(EnchantmentKind::Normal));
+
+        let card_script = engine.get_card_script(1)?;
+        card_script.activate(card, engine.game.player1.clone())?;
 
         assert!(matches!(
             engine.game.player1.field.borrow().yokai_2,

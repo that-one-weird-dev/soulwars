@@ -1,92 +1,26 @@
-use mlua::{IntoLua, UserData};
+use std::rc::Rc;
 
-macro_rules! add_card_field {
-    ($fields:expr, $variant:ident, $field:ident, $value:expr) => {
-        $fields.add_field_method_get("$field", |lua, this| match this {
-            Card::$variant { $field, .. } => IntoLua::into_lua($value, lua),
-            _ => Ok(mlua::Value::Nil),
-        });
-    };
-}
+use mlua::UserData;
 
-pub enum EnchantmentKind {
-    Normal,
-    Blessing,
-    Curse,
-}
+use crate::card_data::CardData;
 
-impl EnchantmentKind {
-    fn as_str(&self) -> &'static str {
-        match self {
-            EnchantmentKind::Normal => "normal",
-            EnchantmentKind::Blessing => "blessing",
-            EnchantmentKind::Curse => "curse",
-        }
-    }
-}
-
-impl Into<String> for EnchantmentKind {
-    fn into(self) -> String {
-        match self {
-            EnchantmentKind::Normal => "normal",
-            EnchantmentKind::Blessing => "blessing",
-            EnchantmentKind::Curse => "curse",
-        }
-        .to_string()
-    }
-}
-
-impl From<&String> for EnchantmentKind {
-    fn from(value: &String) -> Self {
-        match value.as_str() {
-            "normal" => EnchantmentKind::Normal,
-            "blessing" => EnchantmentKind::Blessing,
-            "curse" => EnchantmentKind::Curse,
-            _ => EnchantmentKind::Normal,
-        }
-    }
-}
-
-pub enum Card {
-    Yokai {
-        max_health: i64,
-        health: i64,
-        damage: i64,
-    },
-    Artifact {},
-    Terrain {},
-    Enchantment {
-        kind: EnchantmentKind,
-    },
+pub struct Card {
+    id: i64,
+    data: Rc<CardData>,
 }
 
 impl Card {
-    pub fn yokai(max_health: i64, health: i64, damage: i64) -> Self {
-        Self::Yokai {
-            max_health,
-            health,
-            damage,
+    pub fn new(id: i64, data: CardData) -> Self {
+        Self {
+            id,
+            data: Rc::new(data),
         }
-    }
-    pub fn artifact() -> Self {
-        Self::Artifact {}
-    }
-    pub fn terrain() -> Self {
-        Self::Terrain {}
-    }
-    pub fn enchantment(kind: EnchantmentKind) -> Self {
-        Self::Enchantment { kind }
     }
 }
 
 impl UserData for Card {
     fn add_fields<'lua, F: mlua::prelude::LuaUserDataFields<'lua, Self>>(fields: &mut F) {
-        // Yokai
-        add_card_field!(fields, Yokai, max_health, *max_health);
-        add_card_field!(fields, Yokai, health, *health);
-        add_card_field!(fields, Yokai, damage, *damage);
-
-        // Enchantment
-        add_card_field!(fields, Enchantment, kind, kind.as_str());
+        fields.add_field_method_get("id", |_, this| Ok(this.id));
+        fields.add_field_method_get("data", |_, this| Ok(this.data.clone()));
     }
 }

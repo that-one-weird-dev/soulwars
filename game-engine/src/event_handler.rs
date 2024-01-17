@@ -1,15 +1,19 @@
-use crate::{player::Player, field_slot::FieldSlot};
+use mlua::Result;
 
-pub type EventFn<Args, Ret> = fn(player: &Player, args: Args) -> Ret;
+use crate::{field_slot::FieldSlot, player::Player};
+
+pub type EventFn<Args, Ret> = Box<dyn Fn(&Player, Args) -> Result<Ret>>;
 
 pub struct EventHandler {
+    pub debug: EventFn<(), ()>,
     pub select_slot: EventFn<(), FieldSlot>,
 }
 
 impl Default for EventHandler {
     fn default() -> Self {
         Self {
-            select_slot: |_, ()| FieldSlot::Yokai1,
+            debug: Box::new(|_, _| Ok(())),
+            select_slot: Box::new(|_, _| Ok(FieldSlot::Yokai1)),
         }
     }
 }

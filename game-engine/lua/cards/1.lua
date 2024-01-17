@@ -10,4 +10,4 @@ function card:activate(player)
 	end)
 end
 
-return card
+create_card(1, card)

@@ -11,10 +11,10 @@
 <button
     class="card {interactable
         ? 'card-hover'
-        : 'cursor-auto'} variant-filled w-[18rem] h-[26rem] text-left"
+        : 'cursor-auto'} variant-filled aspect-[0.69] w-[18rem] text-left"
     on:click={() => dispatch("click")}
 >
-    <section class="p-4 h-full flex flex-col justify-between gap-3">
+    <div class="p-4 h-full flex flex-col justify-between gap-3">
         <header class="flex flex-col gap-3">
             <h1 class="text-2xl font-bold">{card.name}</h1>
 
@@ -26,13 +26,11 @@
             />
         </header>
 
-        <section
-            class="h-[14rem] overflow-hidden text-sm"
-        >
+        <section class="h-full overflow-hidden text-sm">
             {card.description}
         </section>
 
-        <footer>
+        <footer class="flex flex-row justify-between">
             {#if card.cardType === CardType.Yokai}
                 <span
                     class="chip variant-filled-error min-w-24 shadow-lg cursor-auto"
@@ -40,11 +38,11 @@
                     <strong class="text-xl">{card.damage}</strong>
                 </span>
                 <span
-                    class="chip variant-filled-success min-w-24 float-end shadow-lg cursor-auto"
+                    class="chip variant-filled-success min-w-24 shadow-lg cursor-auto"
                 >
                     <strong class="text-xl">{card.health}</strong>
                 </span>
             {/if}
         </footer>
-    </section>
+    </div>
 </button>

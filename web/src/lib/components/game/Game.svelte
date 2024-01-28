@@ -43,6 +43,13 @@
         selectedCard = undefined;
         selectableSlots = {};
     }
+
+    function onKeyDown(e: KeyboardEvent) {
+        if (e.key === "Escape") {
+            selectedCard = undefined;
+            selectableSlots = {};
+        }
+    }
 </script>
 
 <main class="w-full h-full flex flex-col items-center gap-16 m-5">
@@ -62,3 +69,5 @@
         <Hand {hand} {selectedCard} on:select={onSelectFromHand} />
     </div>
 </section>
+
+<svelte:window on:keydown={onKeyDown} />

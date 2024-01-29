@@ -5,13 +5,13 @@
     import type { GameCard } from "$lib/types/card";
 
     export let inverted = false;
-    export let selectableSlots: { [K in FieldSlot]?: boolean } = {};
+    export let selectableSlots: FieldSlot[] = [];
     export let field: { [K in FieldSlot]?: GameCard } = {};
 
     const dispatch = createEventDispatcher<{ select: FieldSlot }>();
 
     function onSelect(slot: FieldSlot) {
-        if (!selectableSlots[slot]) return;
+        if (!selectableSlots.includes(slot)) return;
 
         dispatch("select", slot);
     }
@@ -25,26 +25,26 @@
         >
             <GameCardSlot
                 letter="I"
-                selectable={!!selectableSlots["enchantment"]}
+                selectable={!!selectableSlots.includes("enchantment")}
                 on:click={() => onSelect("enchantment")}
             />
         </div>
 
         <GameCardSlot
             letter="Y"
-            selectable={!!selectableSlots["yokai-1"]}
+            selectable={!!selectableSlots.includes("yokai-1")}
             on:click={() => onSelect("yokai-1")}
             card={field["yokai-1"]}
         />
         <GameCardSlot
             letter="Y"
-            selectable={!!selectableSlots["yokai-2"]}
+            selectable={!!selectableSlots.includes("yokai-2")}
             on:click={() => onSelect("yokai-2")}
             card={field["yokai-2"]}
         />
         <GameCardSlot
             letter="Y"
-            selectable={!!selectableSlots["yokai-3"]}
+            selectable={!!selectableSlots.includes("yokai-3")}
             on:click={() => onSelect("yokai-3")}
             card={field["yokai-3"]}
         />
@@ -55,7 +55,7 @@
         >
             <GameCardSlot
                 letter="T"
-                selectable={!!selectableSlots["terrain"]}
+                selectable={!!selectableSlots.includes("terrain")}
                 on:click={() => onSelect("terrain")}
                 card={field["terrain"]}
             />
@@ -71,19 +71,19 @@
 
         <GameCardSlot
             letter="A"
-            selectable={!!selectableSlots["artifact-1"]}
+            selectable={!!selectableSlots.includes("artifact-1")}
             on:click={() => onSelect("artifact-1")}
             card={field["artifact-1"]}
         />
         <GameCardSlot
             letter="A"
-            selectable={!!selectableSlots["artifact-2"]}
+            selectable={!!selectableSlots.includes("artifact-2")}
             on:click={() => onSelect("artifact-2")}
             card={field["artifact-2"]}
         />
         <GameCardSlot
             letter="A"
-            selectable={!!selectableSlots["artifact-3"]}
+            selectable={!!selectableSlots.includes("artifact-3")}
             on:click={() => onSelect("artifact-3")}
             card={field["artifact-3"]}
         />

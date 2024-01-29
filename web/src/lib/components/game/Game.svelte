@@ -12,7 +12,7 @@
     export let hand: GameCard[] = [];
 
     let selectedCard: number | undefined;
-    let selectableSlots = {};
+    let selectableSlots: FieldSlot[] = [];
     let field: { [K in FieldSlot]?: GameCard } = {};
 
     onMount(async () => {
@@ -26,11 +26,7 @@
 
     function onSelectFromHand(event: CustomEvent<number>) {
         selectedCard = event.detail;
-        selectableSlots = {
-            "yokai-1": true,
-            "yokai-2": true,
-            "yokai-3": true,
-        };
+        selectableSlots = ["yokai-1", "yokai-2", "yokai-3"];
     }
 
     function onSelectSlot(event: CustomEvent<FieldSlot>) {
@@ -41,13 +37,13 @@
 
         hand = hand.toSpliced(selectedCard, 1);
         selectedCard = undefined;
-        selectableSlots = {};
+        selectableSlots = [];
     }
 
     function onKeyDown(e: KeyboardEvent) {
         if (e.key === "Escape") {
             selectedCard = undefined;
-            selectableSlots = {};
+            selectableSlots = [];
         }
     }
 </script>

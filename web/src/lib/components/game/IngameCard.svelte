@@ -7,6 +7,7 @@
     export let card: GameCard;
     export let scale = 1;
     export let interactable = true;
+    export let tiltScale = 1.05;
 
     const dispatch = createEventDispatcher<{ click: void }>();
 
@@ -28,6 +29,6 @@
         class="absolute"
         style="transform-origin: 0 0; transform: scale({scale});"
     >
-        <Card on:click={() => dispatch("click")} {card} {interactable} />
+        <Card on:click={() => dispatch("click")} {card} {interactable} {tiltScale} />
     </div>
 </div>

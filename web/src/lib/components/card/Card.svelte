@@ -1,17 +1,20 @@
 <script lang="ts">
     import { CardType, type GameCard } from "$lib/types/card";
     import { createEventDispatcher } from "svelte";
+    import tilt from "svelte-tilt";
 
     export let card: GameCard;
     export let interactable = false;
+    export let tiltScale = 1.05;
 
     const dispatch = createEventDispatcher<{ click: void }>();
 </script>
 
 <button
+    use:tilt={{ reverse: true, scale: tiltScale }}
     class="card {interactable
-        ? 'card-hover'
-        : 'cursor-auto'} variant-filled aspect-[0.69] w-[18rem] text-left"
+        ? ''
+        : 'cursor-auto'} variant-filled aspect-[0.69] w-[18rem] text-left hover:shadow-2xl hover:z-50"
     on:click={() => dispatch("click")}
 >
     <div class="p-4 h-full flex flex-col justify-between gap-3">
@@ -45,4 +48,5 @@
             {/if}
         </footer>
     </div>
+    <slot />
 </button>

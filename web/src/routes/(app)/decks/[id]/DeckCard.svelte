@@ -36,54 +36,54 @@
 </script>
 
 <div class="relative">
-    <Card {card} />
-    {#if !editing}
-        <div class="absolute w-full h-full top-0 left-0 p-3">
-            <div class="flex justify-end">
-                <button
-                    class="btn variant-filled-primary"
-                    on:click={() => (editing = true)}
-                >
-                    <span>
-                        <Icon icon="mdi:edit" class="text-lg" />
-                    </span>
-                    <span>{count}</span>
-                </button>
+    <Card {card}>
+        {#if !editing}
+            <div class="absolute w-full h-full top-0 left-0 p-3">
+                <div class="flex justify-end">
+                    <button
+                        class="btn variant-filled-primary"
+                        on:click={() => (editing = true)}
+                    >
+                        <span>
+                            <Icon icon="mdi:edit" class="text-lg" />
+                        </span>
+                        <span>{count}</span>
+                    </button>
+                </div>
+            </div>
+        {/if}
+        <div
+            class="absolute w-full h-full top-0 left-0 rounded-lg variant-glass p-4 {editing
+                ? ''
+                : 'pointer-events-none'} {editing
+                ? 'opacity-100'
+                : 'opacity-0'} transition-opacity"
+        >
+            <div class="flex flex-col gap-3">
+                <div class="flex gap-3">
+                    <button class="btn variant-filled" on:click={() => add(-1)}>
+                        <Icon icon="mdi:minus" />
+                    </button>
+                    <input
+                        class="input variant-filled border-none"
+                        type="number"
+                        bind:value={count}
+                        readonly
+                    />
+                    <button class="btn variant-filled" on:click={() => add(1)}>
+                        <Icon icon="mdi:plus" />
+                    </button>
+                </div>
+                {#if count === 0}
+                    <button class="btn variant-filled-error" on:click={confirm}
+                        >Remove</button
+                    >
+                {:else}
+                    <button class="btn variant-filled" on:click={confirm}
+                        >Confirm</button
+                    >
+                {/if}
             </div>
         </div>
-    {/if}
-    <div
-        class="absolute w-full h-full top-0 left-0 rounded-lg variant-glass p-4 {editing
-            ? ''
-            : 'pointer-events-none'} {editing
-            ? 'opacity-100'
-            : 'opacity-0'} transition-opacity"
-    >
-        <div class="flex flex-col gap-3">
-            <div class="flex gap-3">
-                <button class="btn variant-filled" on:click={() => add(-1)}>
-                    <Icon icon="mdi:minus" />
-                </button>
-                <input
-                    class="input variant-filled border-none"
-                    type="number"
-                    bind:value={count}
-                    readonly
-                />
-                <button class="btn variant-filled" on:click={() => add(1)}>
-                    <Icon icon="mdi:plus" />
-                </button>
-            </div>
-            {#if count === 0}
-                <button
-                    class="btn variant-filled-error"
-                    on:click={confirm}>Remove</button
-                >
-            {:else}
-                <button class="btn variant-filled" on:click={confirm}
-                    >Confirm</button
-                >
-            {/if}
-        </div>
-    </div>
+    </Card>
 </div>

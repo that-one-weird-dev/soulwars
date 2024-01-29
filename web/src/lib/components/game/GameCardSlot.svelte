@@ -25,8 +25,8 @@
         : 'border-surface-700'}"
 >
     {#if card}
-        <div class="pointer-events-none h-full">
-            <IngameCard {card} scale={0.35} interactable={false} />
+        <div class="h-full">
+            <IngameCard {card} scale={0.35} interactable={false} tiltScale={1.6} />
         </div>
     {:else}
         {letter}

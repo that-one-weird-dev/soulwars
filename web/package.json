@@ -45,6 +45,7 @@
     "@auth/sveltekit": "^0.5.0",
     "@floating-ui/dom": "1.5.3",
     "socket.io-client": "^4.7.2",
+    "svelte-tilt": "^0.0.3",
     "wretch": "^2.7.1"
   }
 }

@@ -3,6 +3,7 @@
     import type { FieldSlot } from "$lib/types/field-slot";
     import { createEventDispatcher } from "svelte";
     import type { GameCard } from "$lib/types/card";
+    import { getDrawerStore } from "@skeletonlabs/skeleton";
 
     export let inverted = false;
     export let selectableSlots: FieldSlot[] = [];
@@ -12,11 +13,21 @@
     export let cardsInDeck: number = 20;
 
     const dispatch = createEventDispatcher<{ select: FieldSlot }>();
+    const drawerStore = getDrawerStore();
 
     function onSelect(slot: FieldSlot) {
         if (!selectableSlots.includes(slot)) return;
 
         dispatch("select", slot);
+    }
+
+    function openGraveyard() {
+        drawerStore.open({
+            id: "card-list",
+            meta: {
+                cards: graveyard.toReversed(),
+            },
+        });
     }
 </script>
 
@@ -69,7 +80,7 @@
             class="mr-8"
             style="transform: translateY({inverted ? '-2rem' : '2rem'});"
         >
-            <GameCardSlot letter="C" card={graveyard[graveyard.length - 1]} />
+            <GameCardSlot letter="C" card={graveyard[graveyard.length - 1]} on:click={openGraveyard} />
         </div>
 
         <GameCardSlot

@@ -14,6 +14,7 @@
     let selectedCard: number | undefined;
     let selectableSlots: FieldSlot[] = [];
     let field: { [K in FieldSlot]?: GameCard } = {};
+    let graveyard: GameCard[] = [];
 
     onMount(async () => {
         const deck = await wretch("/decks/2/cards").get().json<GameDeck>();
@@ -22,6 +23,7 @@
         );
 
         hand = shuffle(cards).slice(0, 5);
+        graveyard = shuffle(cards).slice(0, 5);
     });
 
     function onSelectFromHand(event: CustomEvent<number>) {
@@ -50,7 +52,7 @@
 
 <main class="w-full h-full flex flex-col items-center gap-16 m-5">
     <GameField inverted={true} />
-    <GameField {selectableSlots} {field} on:select={onSelectSlot} />
+    <GameField {selectableSlots} {field} {graveyard} on:select={onSelectSlot} />
 </main>
 
 <section class="w-full h-full left-0 bottom-0 absolute pointer-events-none">

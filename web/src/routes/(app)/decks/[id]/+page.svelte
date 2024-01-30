@@ -17,7 +17,7 @@
 
     function insertCard() {
         drawerStore.open({
-            id: "card-select",
+            id: "card-picker",
             position: "right",
             meta: {
                 select: addCard,

@@ -16,6 +16,7 @@
     } from "@floating-ui/dom";
     import { storePopup } from "@skeletonlabs/skeleton";
     import DeckView from "./(app)/decks/DeckView.svelte";
+    import CardPickerDrawer from "$lib/components/drawer/CardPickerDrawer.svelte";
     import CardListDrawer from "$lib/components/drawer/CardListDrawer.svelte";
 
     initializeStores();
@@ -29,7 +30,9 @@
 <Drawer position="bottom">
     {#if $drawerStore.id === "deck"}
         <DeckView {...$drawerStore.meta} />
-    {:else if $drawerStore.id === "card-select"}
+    {:else if $drawerStore.id === "card-picker"}
+        <CardPickerDrawer {...$drawerStore.meta} />
+    {:else if $drawerStore.id === "card-list"}
         <CardListDrawer {...$drawerStore.meta} />
     {/if}
 </Drawer>

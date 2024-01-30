@@ -4,7 +4,7 @@
     import Card from "../card/Card.svelte";
     import { gameCardOverlay } from "$lib/stores/gameCardOverlay";
 
-    export let card: GameCard;
+    export let card: GameCard | undefined;
     export let scale = 1;
     export let interactable = true;
     export let tiltScale = 1.05;

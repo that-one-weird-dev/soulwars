@@ -9,6 +9,7 @@ services:
             - .env
         environment:
             - PUBLIC_BACKEND_ADDRESS=ws://localhost:3000
+            - ENV_DIR=.
         ports:
             - 5173:5173
         volumes:

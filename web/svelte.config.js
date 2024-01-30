@@ -7,7 +7,10 @@ const config = {
 	preprocess: [vitePreprocess()],
 	
 	kit: {
-		adapter: adapter()
-	}
+		adapter: adapter(),
+		env: {
+			dir: process.env.ENV_DIR || "../",
+		},
+	},
 };
 export default config;

@@ -37,7 +37,13 @@ async function fetchCardsNotInDeck(
             ...getTableColumns(cards),
         })
         .from(cards)
-        .leftJoin(decksToCards, and(eq(cards.id, decksToCards.cardId), eq(decksToCards.deckId, deckId)))
+        .leftJoin(
+            decksToCards,
+            and(
+                eq(cards.id, decksToCards.cardId),
+                eq(decksToCards.deckId, deckId),
+            ),
+        )
         .where(
             and(
                 like(cards.name, `%${name}%`),

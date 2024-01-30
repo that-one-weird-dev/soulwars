@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1.0.79"
 axum = "0.7.3"
+early_returns = "0.4.0"
 serde = "1.0.194"
 serde_json = "1.0.111"
 socketioxide = { version = "0.10.0", features = ["extensions", "state"] }
@@ -12,3 +14,4 @@ tokio = { version = "1.35.1", features = ["rt-multi-thread", "macros"] }
 tracing = "0.1.40"
 tracing-subscriber = "0.3.18"
 uuid = "1.6.1"
+game_engine = { path = "../game-engine" }

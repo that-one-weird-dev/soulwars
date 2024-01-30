@@ -3,6 +3,7 @@ import type { Config } from "tailwindcss";
 import typography from "@tailwindcss/typography";
 import { skeleton } from "@skeletonlabs/tw-plugin";
 import forms from "@tailwindcss/forms";
+import tailwindcss3d from "tailwindcss-3d";
 
 export default {
     darkMode: "class",
@@ -28,6 +29,7 @@ export default {
                 ],
             },
         }),
-		forms,
+        forms,
+        tailwindcss3d,
     ],
 } satisfies Config;

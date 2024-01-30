@@ -7,6 +7,7 @@
     export let letter = "";
     export let selectable = false;
     export let card: GameCard | undefined = undefined;
+    export let showCardBack = false;
 
     const dispatch = createEventDispatcher<{ click: void }>();
 
@@ -28,7 +29,7 @@
         {letter}
     </div>
 
-    {#if card}
+    {#if card || showCardBack}
         <IngameCard {card} scale={0.35} tiltScale={2} />
     {/if}
 </button>

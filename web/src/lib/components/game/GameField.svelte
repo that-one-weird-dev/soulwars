@@ -6,7 +6,10 @@
 
     export let inverted = false;
     export let selectableSlots: FieldSlot[] = [];
+
     export let field: { [K in FieldSlot]?: GameCard } = {};
+    export let graveyard: GameCard[] = [];
+    export let cardsInDeck: number = 20;
 
     const dispatch = createEventDispatcher<{ select: FieldSlot }>();
 
@@ -66,7 +69,7 @@
             class="mr-8"
             style="transform: translateY({inverted ? '-2rem' : '2rem'});"
         >
-            <GameCardSlot letter="C" />
+            <GameCardSlot letter="C" card={graveyard[graveyard.length - 1]} />
         </div>
 
         <GameCardSlot
@@ -92,7 +95,7 @@
             class="ml-8"
             style="transform: translateY({inverted ? '-2rem' : '2rem'});"
         >
-            <GameCardSlot letter="M" />
+            <GameCardSlot letter="M" showCardBack={cardsInDeck > 0} />
         </div>
     </div>
 </div>

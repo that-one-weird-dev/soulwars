@@ -29,6 +29,16 @@
             },
         });
     }
+
+    function openDeck() {
+        drawerStore.open({
+            id: "card-list",
+            meta: {
+                cards: new Array(cardsInDeck).fill(undefined),
+                showFilters: false,
+            },
+        });
+    }
 </script>
 
 <div class="flex {inverted ? 'flex-col-reverse mt-8' : 'flex-col mb-8'} gap-3">
@@ -106,7 +116,7 @@
             class="ml-8"
             style="transform: translateY({inverted ? '-2rem' : '2rem'});"
         >
-            <GameCardSlot letter="M" showCardBack={cardsInDeck > 0} />
+            <GameCardSlot letter="M" showCardBack={cardsInDeck > 0} on:click={openDeck} />
         </div>
     </div>
 </div>

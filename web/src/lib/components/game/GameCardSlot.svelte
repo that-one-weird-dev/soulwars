@@ -20,15 +20,15 @@
 <button
     on:click={() => dispatch("click")}
     on:contextmenu|preventDefault={showCard}
-    class="variant-glass-surface aspect-[0.69] w-[7.5rem] rounded-xl text-8xl text-surface-700 border hover:shadow-lg cursor-pointer flex items-center justify-center {selectable
-        ? 'border-primary-700 border-2 shadow-xl'
-        : 'border-surface-700'}"
+    class="aspect-[0.69] w-[7.5rem] relative flex justify-center items-center"
 >
-    {#if card}
-        <div class="h-full">
-            <IngameCard {card} scale={0.35} interactable={false} tiltScale={1.6} />
-        </div>
-    {:else}
+    <div class="absolute w-full h-full flex justify-center items-center {selectable
+        ? 'border-primary-700 border-2 shadow-xl'
+        : 'border-surface-700'} variant-glass-surface text-surface-700 text-8xl rounded-xl border hover:shadow-lg cursor-pointer">
         {letter}
+    </div>
+
+    {#if card}
+        <IngameCard {card} scale={0.35} tiltScale={2} />
     {/if}
 </button>

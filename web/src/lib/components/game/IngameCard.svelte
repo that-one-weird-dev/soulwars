@@ -21,7 +21,7 @@
 <div
     role="button"
     tabindex="0"
-    class="aspect-[0.69]"
+    class="aspect-[0.69] hover:z-10"
     style="width: {18 * scale}rem;"
     on:contextmenu|preventDefault={showOverlay}
 >

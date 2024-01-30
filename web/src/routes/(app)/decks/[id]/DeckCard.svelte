@@ -36,9 +36,11 @@
 </script>
 
 <div class="relative">
-    <Card {card}>
+    <Card effect3d={!editing} {card}>
         {#if !editing}
-            <div class="absolute w-full h-full top-0 left-0 p-3">
+            <div
+                class="absolute w-full h-full top-0 left-0 p-3 transition translate-z-4 active:translate-z-2"
+            >
                 <div class="flex justify-end">
                     <button
                         class="btn variant-filled-primary"
@@ -53,13 +55,12 @@
             </div>
         {/if}
         <div
-            class="absolute w-full h-full top-0 left-0 rounded-lg variant-glass p-4 {editing
-                ? ''
-                : 'pointer-events-none'} {editing
-                ? 'opacity-100'
-                : 'opacity-0'} transition-opacity"
+            class="absolute w-full h-full top-0 left-0 rounded-lg variant-glass p-4 transition-all transform-style-3d"
+            class:pointer-events-none={!editing}
+            class:opacity-100={editing}
+            class:opacity-0={!editing}
         >
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-3 translate-z-4">
                 <div class="flex gap-3">
                     <button class="btn variant-filled" on:click={() => add(-1)}>
                         <Icon icon="mdi:minus" />

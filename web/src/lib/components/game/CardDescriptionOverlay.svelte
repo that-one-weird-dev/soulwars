@@ -15,7 +15,7 @@ import type { GameCard } from "$lib/types/card";
     <div
         role="button"
         tabindex="0"
-        class="absolute w-full h-full top-0 left-0 flex items-center justify-center z-20 variant-glass"
+        class="absolute w-full h-full top-0 left-0 flex items-center justify-center z-40 variant-glass"
         on:click={dismiss}
     >
         <main class="flex flex-row gap-5">

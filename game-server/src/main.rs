@@ -1,5 +1,5 @@
 use socketioxide::SocketIo;
-use state::game_state::GameState;
+use state::{game_state::GameState, partial_game_state::PartialGameState};
 use tracing_subscriber::FmtSubscriber;
 
 mod handlers;
@@ -13,6 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let (layer, io) = SocketIo::builder()
         .with_state(GameState::default())
+        .with_state(PartialGameState::default())
         .build_layer();
 
     io.ns("/", handlers::connection::handle_connection);

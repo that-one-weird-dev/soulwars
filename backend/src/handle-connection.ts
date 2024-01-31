@@ -23,25 +23,27 @@ export async function handleConnection(socket: TypedSocket) {
 
             callback({ matchId });
 
-            handleGameStart(socket, socket.data.user.id);
+            socket.on("game:start", (deck) => {
+                handleGameStart(socket, socket.data.user.id, deck);
+            });
         });
 
         publishFind(socket.data.user.id);
     });
 }
 
-async function handleGameStart(socket: TypedSocket, userId: string) {
+async function handleGameStart(socket: TypedSocket, userId: string, deck: number[]) {
     const gameServerSocket = io(env.GAME_SERVER_URL, {
         auth: {
-            id: userId
+            userId: userId,
+            gameId: "5c1ab66f-d453-4285-82fc-963fb6096947",
+            deck,
         },
         transports: ["websocket"],
     });
 
     gameServerSocket.on("connect", () => {
         console.log("connected to game server")
-
-        socket.emit("match:ready");
     });
 
     gameServerSocket.onAny(async (event, ...args) => {
@@ -54,6 +56,7 @@ async function handleGameStart(socket: TypedSocket, userId: string) {
         if (lastArg instanceof Function) {
             console.log(`emitting ${event} with ack`)
             const response = await gameServerSocket.emitWithAck(event, ...(args.toSpliced(args.length - 1, 1)));
+            console.log(response);
 
             lastArg(response);
         } else {

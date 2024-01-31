@@ -2,6 +2,8 @@
     import { io } from "socket.io-client";
     import { PUBLIC_BACKEND_ADDRESS } from "$env/static/public";
     import type { PageData } from "./$types";
+    import { gameSocket } from "$lib/stores/game";
+    import { goto } from "$app/navigation";
 
     export let data: PageData;
 
@@ -15,9 +17,11 @@
         },
     });
 
-    socket.on("match:ready", async () => {
-        console.log("match ready");
-        console.log(await socket.emitWithAck("info:hand", "test"));
+    socket.on("game:ready", async () => {
+        console.log("game ready");
+
+        $gameSocket = socket;
+        goto("/game");
     })
 
     async function connect() {
@@ -25,6 +29,8 @@
         const matchInfo = await socket.emitWithAck("match:find");
         matchId = matchInfo.matchId;
         currentState = "found";
+
+        socket.emit("game:start", [1, 2, 3, 4]);
     }
 </script>
 

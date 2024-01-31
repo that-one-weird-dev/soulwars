@@ -7,11 +7,11 @@ export type SocketData = {
 
 export type ClientToServerEvents = {
     "match:find": (callback: (matchData: { matchId: string }) => void) => void;
+    "game:start": (deck: number[]) => void;
 };
 
 export type ServerToClientEvents = {
-    "match:found": () => void;
-    "match:ready": () => void;
+    "cant-leave-this-empty": () => void,
 };
 
 export type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents, {}, SocketData>;

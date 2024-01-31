@@ -15,9 +15,8 @@ unsafe impl Send for GameState {}
 unsafe impl Sync for GameState {}
 
 impl GameState {
-    pub fn create_game(&self, id: Uuid) {
-        let game = GameEngine::new(id);
-        self.games_mut().insert_game(game);
+    pub fn create_game(&self, id: Uuid, game: GameEngine) {
+        self.games_mut().insert_game(id, game);
     }
 
     pub fn games(&self) -> std::sync::RwLockReadGuard<GameStore> {
@@ -35,8 +34,8 @@ pub struct GameStore {
 }
 
 impl GameStore {
-    pub fn insert_game(&mut self, game: GameEngine) {
-        self.games.insert(game.id.clone(), Mutex::new(game));
+    pub fn insert_game(&mut self, id: Uuid, game: GameEngine) {
+        self.games.insert(id, Mutex::new(game));
     }
 
     pub fn get(&self, game_id: Uuid) -> Option<std::sync::MutexGuard<GameEngine>> {

@@ -1,30 +1,16 @@
 <script lang="ts">
     import type { GameCard } from "$lib/types/card";
-    import { onMount } from "svelte";
     import GameField from "./GameField.svelte";
-    import wretch from "wretch";
     import Hand from "./Hand.svelte";
-    import type { GameDeck } from "$lib/types/deck";
-    import { shuffle } from "$lib/utils/shuffle";
     import IngameCard from "./IngameCard.svelte";
     import type { FieldSlot } from "$lib/types/field-slot";
 
     export let hand: GameCard[] = [];
+    export let graveyard: GameCard[] = [];
 
     let selectedCard: number | undefined;
     let selectableSlots: FieldSlot[] = [];
     let field: { [K in FieldSlot]?: GameCard } = {};
-    let graveyard: GameCard[] = [];
-
-    onMount(async () => {
-        const deck = await wretch("/decks/2/cards").get().json<GameDeck>();
-        const cards = deck.decksToCards.flatMap((dtc) =>
-            new Array(dtc.count).fill(dtc.card),
-        );
-
-        hand = shuffle(cards).slice(0, 5);
-        graveyard = shuffle(cards).slice(0, 5);
-    });
 
     function onSelectFromHand(event: CustomEvent<number>) {
         selectedCard = event.detail;

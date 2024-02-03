@@ -390,6 +390,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "mlua",
+ "tokio",
  "uuid",
 ]
 
@@ -670,6 +671,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1aba10897af47c8e85283db95529b0c6a2d8f3c7b9733c0d2f206d9ee8fc51a3"
 dependencies = [
  "bstr",
+ "futures-util",
  "mlua-sys",
  "num-traits",
  "once_cell",
@@ -1130,9 +1132,9 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 
 [[package]]
 name = "tokio"
-version = "1.35.1"
+version = "1.36.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c89b4efa943be685f629b149f53829423f8f5531ea21249408e8e2f8671ec104"
+checksum = "61285f6515fa018fb2d1e46eb21223fff441ee8db5d0f1435e8ab4f5cdb80931"
 dependencies = [
  "backtrace",
  "bytes",

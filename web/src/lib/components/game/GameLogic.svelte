@@ -8,6 +8,11 @@
 
     let hand: GameCard[] = [];
 
+    socket.on("game:select:field-slot", (_, callback: (fieldSlot: string) => void) => {
+        console.log("requested field slot selection");
+        callback("artifact-1");
+    });
+
     socket
         .emitWithAck("info:hand")
         .then(({ cards }: { cards: number[] }) => {

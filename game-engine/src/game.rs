@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use mlua::UserData;
 
@@ -7,14 +7,14 @@ use crate::{
 };
 
 pub struct Game {
-    pub player1: Rc<Player>,
-    pub player2: Rc<Player>,
+    pub player1: Arc<Player>,
+    pub player2: Arc<Player>,
 }
 
 impl Game {
     pub fn new(
-        event_handler: Rc<Box<dyn EventHandler>>,
-        card_storage: Rc<CardStorage>,
+        event_handler: Arc<Box<dyn EventHandler + Send + Sync>>,
+        card_storage: Arc<CardStorage>,
         deck_1: Vec<CardType>,
         deck_2: Vec<CardType>,
     ) -> Self {
@@ -22,8 +22,8 @@ impl Game {
         let player_2 = Player::new(2, event_handler, card_storage, deck_2);
 
         Self {
-            player1: Rc::new(player_1),
-            player2: Rc::new(player_2),
+            player1: Arc::new(player_1),
+            player2: Arc::new(player_2),
         }
     }
 }

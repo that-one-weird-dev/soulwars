@@ -6,7 +6,7 @@ mod handlers;
 mod state;
 mod engine;
 
-#[tokio::main]
+#[tokio::main()]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let subscriber = FmtSubscriber::new();
 

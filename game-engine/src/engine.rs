@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 
 use mlua::{AsChunk, Lua, Table};
 
@@ -13,25 +13,28 @@ pub enum PlayerId {
 }
 
 pub struct GameEngine {
-    pub game: Rc<Game>,
-    pub event_handler: Rc<Box<dyn EventHandler>>,
-    pub card_storage: Rc<CardStorage>,
+    pub game: Arc<Game>,
+    pub event_handler: Arc<Box<dyn EventHandler + Send + Sync>>,
+    pub card_storage: Arc<CardStorage>,
 
     lua: Lua,
 }
 
+unsafe impl Send for GameEngine {}
+unsafe impl Sync for GameEngine {}
+
 impl GameEngine {
     pub fn new(
-        event_handler: Box<dyn EventHandler>,
+        event_handler: Box<dyn EventHandler + Send + Sync>,
         card_storage: CardStorage,
         deck_1: Vec<CardType>,
         deck_2: Vec<CardType>,
     ) -> anyhow::Result<Self> {
-        let event_handler = Rc::new(event_handler);
-        let card_storage = Rc::new(card_storage);
+        let event_handler = Arc::new(event_handler);
+        let card_storage = Arc::new(card_storage);
 
         let game = Game::new(event_handler.clone(), card_storage.clone(), deck_1, deck_2);
-        let game = Rc::new(game);
+        let game = Arc::new(game);
 
         let lua = Lua::new();
         lua.globals().set("game", game.clone())?;
@@ -62,12 +65,12 @@ impl GameEngine {
         Ok(engine)
     }
 
-    pub fn load_script<'a>(
+    pub async fn load_script<'a>(
         &'a self,
         name: impl Into<String>,
         source: impl AsChunk<'a, 'a>,
     ) -> anyhow::Result<()> {
-        Ok(self.lua.load(source).set_name(name).exec()?)
+        self.lua.load(source).set_name(name).exec_async().await.map_err(anyhow::Error::new)
     }
 
     pub fn get_card_script(&self, id: i64) -> anyhow::Result<CardScript> {
@@ -94,7 +97,7 @@ impl GameEngine {
         Ok(())
     }
 
-    fn get_player(&self, player_id: PlayerId) -> &Rc<Player> {
+    fn get_player(&self, player_id: PlayerId) -> &Arc<Player> {
         match player_id {
             PlayerId::Player1 => &self.game.player1,
             PlayerId::Player2 => &self.game.player2,
@@ -114,8 +117,8 @@ mod test {
 
     use super::GameEngine;
 
-    #[test]
-    fn should_summon_when_activated() -> anyhow::Result<()> {
+    #[tokio::test]
+    async fn should_summon_when_activated() -> anyhow::Result<()> {
         let event_handler = DebugEventHandler::new().with_select_slot(FieldSlot::Yokai2);
 
         let mut card_storage = CardStorage::new();
@@ -136,7 +139,7 @@ mod test {
             end,
         })
         ",
-        )?;
+        ).await?;
 
         let card_script = engine.get_card_script(1)?;
         let card = engine.card_storage.create(1)?;
@@ -144,15 +147,15 @@ mod test {
         card_script.activate(card, engine.game.player1.clone())?;
 
         assert!(matches!(
-            engine.game.player1.field.borrow().yokai_2,
+            engine.game.player1.field.lock().unwrap().yokai_2,
             Some(1)
         ));
 
         Ok(())
     }
 
-    #[test]
-    fn should_draw_and_activate() -> anyhow::Result<()> {
+    #[tokio::test]
+    async fn should_draw_and_activate() -> anyhow::Result<()> {
         let event_handler = DebugEventHandler::new().with_select_slot(FieldSlot::Yokai2);
 
         let mut card_storage = CardStorage::new();
@@ -173,13 +176,13 @@ mod test {
             end,
         })
         ",
-        )?;
+        ).await?;
 
         engine.draw(PlayerId::Player1)?;
         engine.activate_card_from_hand(PlayerId::Player1, 0)?;
 
         assert!(matches!(
-            engine.game.player1.field.borrow().yokai_3,
+            engine.game.player1.field.lock().unwrap().yokai_3,
             Some(1)
         ));
 

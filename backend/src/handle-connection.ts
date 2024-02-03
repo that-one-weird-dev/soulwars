@@ -43,12 +43,21 @@ async function handleGameStart(socket: TypedSocket, userId: string, deck: number
     });
 
     gameServerSocket.on("connect", () => {
-        console.log("connected to game server")
+        console.log("connected to game server");
     });
 
     gameServerSocket.onAny(async (event, ...args) => {
         console.log(`game server sent ${event}`);
-        socket.emit(event, ...args);
+
+        const lastArg = args[args.length - 1];
+        if (lastArg instanceof Function) {
+            const response = await socket.emitWithAck(event, ...(args.toSpliced(args.length - 1, 1)));
+            console.log(`client responded to ${event} with ${response}`);
+
+            lastArg(response);
+        } else {
+            socket.emit(event, ...args);
+        }
     });
 
     socket.onAny(async (event, ...args) => {
@@ -56,7 +65,6 @@ async function handleGameStart(socket: TypedSocket, userId: string, deck: number
         if (lastArg instanceof Function) {
             console.log(`emitting ${event} with ack`)
             const response = await gameServerSocket.emitWithAck(event, ...(args.toSpliced(args.length - 1, 1)));
-            console.log(response);
 
             lastArg(response);
         } else {

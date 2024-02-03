@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use mlua::UserData;
 
 use crate::card_data::CardData;
@@ -7,14 +5,14 @@ use crate::card_data::CardData;
 #[derive(Clone)]
 pub struct Card {
     pub id: i64,
-    pub data: Rc<CardData>,
+    pub data: CardData,
 }
 
 impl Card {
     pub fn new(id: i64, data: CardData) -> Self {
         Self {
             id,
-            data: Rc::new(data),
+            data,
         }
     }
 }

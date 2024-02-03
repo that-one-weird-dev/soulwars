@@ -11,15 +11,14 @@ use tracing::info;
 use uuid::Uuid;
 
 use crate::{
-    engine::event_handler::ServerEventHandler,
+    engine::server_event_handler::ServerEventHandler,
+    handlers::info::{self},
     state::{
         game_state::GameState,
         partial_game_state::{PartialGame, PartialGameState},
         user_state::UserState,
     },
 };
-
-use super::info;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

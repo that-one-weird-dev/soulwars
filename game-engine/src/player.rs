@@ -1,7 +1,4 @@
-use std::{
-    cell::RefCell,
-    rc::Rc,
-};
+use std::{cell::RefCell, rc::Rc};
 
 use mlua::{Function, UserData};
 
@@ -16,14 +13,14 @@ pub struct Player {
     pub deck: RefCell<Vec<CardType>>,
     pub field: RefCell<Field>,
 
-    event_handler: Rc<EventHandler>,
+    event_handler: Rc<Box<dyn EventHandler>>,
     card_storage: Rc<CardStorage>,
 }
 
 impl Player {
     pub fn new(
         id: usize,
-        event_handler: Rc<EventHandler>,
+        event_handler: Rc<Box<dyn EventHandler>>,
         card_storage: Rc<CardStorage>,
         deck: Vec<CardType>,
     ) -> Self {
@@ -83,13 +80,11 @@ impl UserData for Player {
             },
         );
 
-        methods.add_method("debug", |_, this, ()| {
-            (this.event_handler.debug)(&this, ())?;
-
-            Ok(())
-        });
         methods.add_method::<_, Function, _>("select_slot", |_, this, callback| {
-            let slot = (this.event_handler.select_slot)(&this, ())?;
+            let slot = this
+                .event_handler
+                .select_slot(&this)
+                .map_err(|err| mlua::Error::external(err.to_string()))?;
             callback.call::<FieldSlot, _>(slot)?;
 
             Ok(())

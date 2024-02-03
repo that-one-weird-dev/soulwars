@@ -370,6 +370,7 @@ name = "game-server"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "axum",
  "early_returns",
  "game_engine",
@@ -387,6 +388,7 @@ name = "game_engine"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "async-trait",
  "mlua",
  "uuid",
 ]

@@ -3,14 +3,14 @@
 
     export let name: string;
     export let preview: string;
-    export let cardCount: number;
+    export let cardCount: number | undefined = undefined;
 
     const dispatch = createEventDispatcher<{ select: void }>();
 
-    function countColor() {
-        if (cardCount < 20) {
+    function countColor(count: number) {
+        if (count < 20) {
             return "variant-filled-warning";
-        } else if (cardCount > 40) {
+        } else if (count > 40) {
             return "variant-filled-warning";
         } else  {
             return "variant-filled-primary"
@@ -25,7 +25,7 @@
     <header class="relative inline-block">
         <img src={preview} alt="" class="aspect-square" />
         {#if cardCount}
-            <span class="chip {countColor()} m-2 absolute top-0 right-0 font-bold text-xl">{cardCount}</span>
+            <span class="chip {countColor(cardCount)} m-2 absolute top-0 right-0 font-bold text-xl">{cardCount}</span>
         {/if}
     </header>
     <section class="p-4">

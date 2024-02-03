@@ -1,5 +1,6 @@
 use mlua::{FromLua, IntoLua, Lua, Value};
 
+#[derive(Clone)]
 pub enum FieldSlot {
     Yokai1,
     Yokai2,

@@ -13,7 +13,7 @@ pub struct Game {
 
 impl Game {
     pub fn new(
-        event_handler: Rc<EventHandler>,
+        event_handler: Rc<Box<dyn EventHandler>>,
         card_storage: Rc<CardStorage>,
         deck_1: Vec<CardType>,
         deck_2: Vec<CardType>,

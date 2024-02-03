@@ -4,8 +4,12 @@
     import type { PageData } from "./$types";
     import { gameSocket } from "$lib/stores/game";
     import { goto } from "$app/navigation";
+    import { getDrawerStore } from "@skeletonlabs/skeleton";
+    import type { GameDeck } from "$lib/types/deck";
 
     export let data: PageData;
+
+    const drawerStore = getDrawerStore();
 
     let currentState: "awaiting" | "searching" | "found" = "awaiting";
     let matchId: string | undefined = undefined;
@@ -24,17 +28,29 @@
         goto("/game");
     })
 
-    async function connect() {
+    async function findMatch() {
+        drawerStore.open({
+            id: "deck-list",
+            meta: {
+                decks: data.decks,
+                onSelect: connect,
+            },
+        })
+    }
+
+    async function connect(deck: GameDeck) {
         currentState = "searching";
         const matchInfo = await socket.emitWithAck("match:find");
         matchId = matchInfo.matchId;
         currentState = "found";
 
-        socket.emit("game:start", [1, 2, 3, 4]);
+        const cards = deck.decksToCards.flatMap(dtc => new Array(dtc.count).fill(dtc.card.id));
+
+        socket.emit("game:start", cards);
     }
 </script>
 
-<button class="btn variant-filled" on:click={connect} disabled={currentState !== "awaiting"}>Find match</button>
+<button class="btn variant-filled" on:click={findMatch} disabled={currentState !== "awaiting"}>Find match</button>
 
 {#if currentState === "found"}
     <span>Match found with game id {matchId}</span>

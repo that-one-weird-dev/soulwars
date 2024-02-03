@@ -11,6 +11,13 @@ export const load: PageServerLoad = async ({ locals }) => {
     }
 
     const deckList = await db.query.decks.findMany({
+        with: {
+            decksToCards: {
+                with: {
+                    card: true,
+                },
+            },
+        },
         where: eq(decks.userId, session.user.id),
     });
 

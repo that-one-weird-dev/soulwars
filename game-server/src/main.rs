@@ -4,6 +4,7 @@ use tracing_subscriber::FmtSubscriber;
 
 mod handlers;
 mod state;
+mod engine;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

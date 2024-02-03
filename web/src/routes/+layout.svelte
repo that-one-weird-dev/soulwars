@@ -18,6 +18,7 @@
     import DeckView from "./(app)/decks/DeckView.svelte";
     import CardPickerDrawer from "$lib/components/drawer/CardPickerDrawer.svelte";
     import CardListDrawer from "$lib/components/drawer/CardListDrawer.svelte";
+    import DeckListDrawer from "$lib/components/drawer/DeckListDrawer.svelte";
 
     initializeStores();
     storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
@@ -34,6 +35,8 @@
         <CardPickerDrawer {...$drawerStore.meta} />
     {:else if $drawerStore.id === "card-list"}
         <CardListDrawer {...$drawerStore.meta} />
+    {:else if $drawerStore.id === "deck-list"}
+        <DeckListDrawer {...$drawerStore.meta} />
     {/if}
 </Drawer>
 

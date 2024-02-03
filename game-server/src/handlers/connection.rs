@@ -3,17 +3,20 @@ use std::sync::Arc;
 use early_returns::ok_or_return;
 use game_engine::{
     card::Card, card_data::CardData, card_storage::CardStorage, card_type::CardType,
-    engine::GameEngine, event_handler::EventHandler,
+    engine::GameEngine,
 };
 use serde::{Deserialize, Serialize};
 use socketioxide::extract::{SocketRef, State, TryData};
 use tracing::info;
 use uuid::Uuid;
 
-use crate::state::{
-    game_state::GameState,
-    partial_game_state::{PartialGame, PartialGameState},
-    user_state::UserState,
+use crate::{
+    engine::event_handler::ServerEventHandler,
+    state::{
+        game_state::GameState,
+        partial_game_state::{PartialGame, PartialGameState},
+        user_state::UserState,
+    },
 };
 
 use super::info;
@@ -57,7 +60,12 @@ pub fn handle_connection(
 
     let mut partial_games = partial_game_state.games.lock().unwrap();
     if let Some(game) = partial_games.get(&user_state.game_id) {
-        let engine = create_game(game.user_socket.clone(), s.clone(), game.user_state.clone(), user_state.clone());
+        let engine = create_game(
+            game.user_socket.clone(),
+            s.clone(),
+            game.user_state.clone(),
+            user_state.clone(),
+        );
         game_state.create_game(user_state.game_id, ok_or_return!(engine));
 
         s.emit("game:ready", ()).ok();
@@ -75,12 +83,14 @@ pub fn handle_connection(
     s.on("info:hand", info::hand);
 
     let game_id = user_state.game_id.clone();
-    s.on_disconnect(move |s: SocketRef, State(partial_game_state): State<PartialGameState>| {
-        let mut partial_games = partial_game_state.games.lock().unwrap();
-        partial_games.remove(&game_id);
+    s.on_disconnect(
+        move |s: SocketRef, State(partial_game_state): State<PartialGameState>| {
+            let mut partial_games = partial_game_state.games.lock().unwrap();
+            partial_games.remove(&game_id);
 
-        s.broadcast().emit("user left", ()).ok();
-    });
+            s.broadcast().emit("user left", ()).ok();
+        },
+    );
 }
 
 fn parse_user_state(auth: AuthMessage) -> Option<UserState> {
@@ -100,8 +110,9 @@ fn create_game(
     user1: UserState,
     user2: UserState,
 ) -> anyhow::Result<GameEngine> {
-    let event_handler = EventHandler {
-        ..Default::default()
+    let event_handler = ServerEventHandler {
+        user1_socket,
+        user2_socket,
     };
 
     let mut card_storage = CardStorage::new();
@@ -110,5 +121,10 @@ fn create_game(
         card_storage.register(i, Card::new(i as i64, CardData::yokai(3, 3, 2)));
     }
 
-    GameEngine::new(event_handler, card_storage, user1.deck, user2.deck)
+    GameEngine::new(
+        Box::new(event_handler),
+        card_storage,
+        user1.deck,
+        user2.deck,
+    )
 }

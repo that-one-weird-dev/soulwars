@@ -14,7 +14,7 @@ pub enum PlayerId {
 
 pub struct GameEngine {
     pub game: Rc<Game>,
-    pub event_handler: Rc<EventHandler>,
+    pub event_handler: Rc<Box<dyn EventHandler>>,
     pub card_storage: Rc<CardStorage>,
 
     lua: Lua,
@@ -22,7 +22,7 @@ pub struct GameEngine {
 
 impl GameEngine {
     pub fn new(
-        event_handler: EventHandler,
+        event_handler: Box<dyn EventHandler>,
         card_storage: CardStorage,
         deck_1: Vec<CardType>,
         deck_2: Vec<CardType>,
@@ -108,18 +108,15 @@ mod test {
         card::Card,
         card_data::{CardData, EnchantmentKind},
         card_storage::CardStorage,
-        event_handler::EventHandler,
-        field_slot::FieldSlot, engine::PlayerId,
+        engine::PlayerId,
+        field_slot::FieldSlot, event_handler::debug::DebugEventHandler,
     };
 
     use super::GameEngine;
 
     #[test]
     fn should_summon_when_activated() -> anyhow::Result<()> {
-        let event_handler = EventHandler {
-            select_slot: Box::new(|_, ()| Ok(FieldSlot::Yokai2)),
-            ..Default::default()
-        };
+        let event_handler = DebugEventHandler::new().with_select_slot(FieldSlot::Yokai2);
 
         let mut card_storage = CardStorage::new();
         card_storage.register(
@@ -127,7 +124,7 @@ mod test {
             Card::new(1, CardData::enchantment(EnchantmentKind::Normal)),
         );
 
-        let engine = GameEngine::new(event_handler, card_storage, vec![9], Vec::new())?;
+        let engine = GameEngine::new(Box::new(event_handler), card_storage, vec![9], Vec::new())?;
         engine.load_script(
             "test",
             r"
@@ -156,10 +153,7 @@ mod test {
 
     #[test]
     fn should_draw_and_activate() -> anyhow::Result<()> {
-        let event_handler = EventHandler {
-            select_slot: Box::new(|_, ()| Ok(FieldSlot::Yokai3)),
-            ..Default::default()
-        };
+        let event_handler = DebugEventHandler::new().with_select_slot(FieldSlot::Yokai2);
 
         let mut card_storage = CardStorage::new();
         card_storage.register(
@@ -167,7 +161,7 @@ mod test {
             Card::new(1, CardData::enchantment(EnchantmentKind::Normal)),
         );
 
-        let engine = GameEngine::new(event_handler, card_storage, vec![1], Vec::new())?;
+        let engine = GameEngine::new(Box::new(event_handler), card_storage, vec![1], Vec::new())?;
         engine.load_script(
             "test",
             r"

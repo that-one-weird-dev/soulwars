@@ -4,6 +4,7 @@ use early_returns::some_or_return;
 use game_engine::card_type::CardType;
 use serde::Serialize;
 use socketioxide::extract::{AckSender, SocketRef, State};
+use tokio_util::task::LocalPoolHandle;
 use tracing::info;
 
 use crate::state::{game_state::GameState, user_state::UserState};
@@ -13,11 +14,11 @@ pub struct HandResponse {
     pub cards: Vec<CardType>,
 }
 
-pub async fn hand(s: SocketRef, ack: AckSender, State(game_state): State<GameState>) {
-    let s = Arc::new(s);
-    let game_store = game_state.games();
+pub async fn hand(s: SocketRef, ack: AckSender, State(game_state): State<GameState>, State(pool): State<LocalPoolHandle>) {
+    pool.spawn_pinned(move || async move {
+        let s = Arc::new(s);
+        let game_store = game_state.games();
 
-    tokio::task::spawn_local(async move {
         info!("Requested hand from user");
 
         let user = s.extensions.get::<UserState>().unwrap();
@@ -39,5 +40,5 @@ pub async fn hand(s: SocketRef, ack: AckSender, State(game_state): State<GameSta
         "#).await.ok();
 
         ack.send(HandResponse { cards }).ok();
-    }).await.ok();
+    });
 }

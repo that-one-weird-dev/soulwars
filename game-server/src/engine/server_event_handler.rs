@@ -1,6 +1,5 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
-use anyhow::anyhow;
 use async_trait::async_trait;
 use game_engine::{field_slot::FieldSlot, player::Player, event_handler::EventHandler};
 use socketioxide::extract::SocketRef;
@@ -10,12 +9,29 @@ pub struct ServerEventHandler {
     pub user2_socket: Arc<SocketRef>,
 }
 
+impl ServerEventHandler {
+    fn player_socket(&self, player: &Player) -> &Arc<SocketRef> {
+        match player.id {
+            1 => &self.user1_socket,
+            _ => &self.user2_socket,
+        }
+    }
+}
+
 #[async_trait]
 impl EventHandler for ServerEventHandler {
-    async fn select_slot(&self, _player: &Player) -> anyhow::Result<FieldSlot> {
-        let response = self.user1_socket.emit_with_ack::<String>("game:select:field-slot", ());
-        let response = response?.await.map_err(|err| anyhow!("{}", err.to_string()))?;
+    async fn select_slot(&self, player: &Player, slots: Vec<FieldSlot>) -> anyhow::Result<FieldSlot> {
+        let response = self.player_socket(player)
+            .timeout(Duration::from_secs(30))
+            .emit_with_ack::<Vec<String>>("game:select:field-slot", (slots,))?
+            .await;
 
-        FieldSlot::try_from(response.data.as_str()).map_err(anyhow::Error::msg)
+        match response {
+            Ok(response) => match &response.data[..] {
+                [data] => FieldSlot::try_from(data.as_str()).map_err(anyhow::Error::msg),
+                _ => Ok(FieldSlot::Yokai1),
+            },
+            Err(_) => Ok(FieldSlot::Yokai1),
+        }
     }
 }

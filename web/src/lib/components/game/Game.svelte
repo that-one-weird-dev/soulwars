@@ -4,53 +4,64 @@
     import Hand from "./Hand.svelte";
     import IngameCard from "./IngameCard.svelte";
     import type { FieldSlot } from "$lib/types/field-slot";
+    import { createEventDispatcher } from "svelte";
+    import type { CardLocation } from "$lib/types/card-location";
+
+    const dispatch = createEventDispatcher<{
+        cancelAction: void;
+        activateCard: CardLocation;
+    }>();
 
     export let hand: GameCard[] = [];
     export let graveyard: GameCard[] = [];
 
-    let selectedCard: number | undefined;
+    export function selectSlot(slots: FieldSlot[], callback: (slot: FieldSlot) => void) {
+        selectableSlots = slots;
+        selectSlotCallback = callback;
+    }
+
     let selectableSlots: FieldSlot[] = [];
+    let selectSlotCallback: ((slot: FieldSlot) => void) | undefined;
+
+    let selectedCard: GameCard | undefined = undefined;
     let field: { [K in FieldSlot]?: GameCard } = {};
-
-    function onSelectFromHand(event: CustomEvent<number>) {
-        selectedCard = event.detail;
-        selectableSlots = ["yokai-1", "yokai-2", "yokai-3"];
-    }
-
-    function onSelectSlot(event: CustomEvent<FieldSlot>) {
-        if (selectedCard === undefined) return;
-        if (field[event.detail] !== undefined) return;
-
-        field[event.detail] = { ...hand[selectedCard] };
-
-        hand = hand.toSpliced(selectedCard, 1);
-        selectedCard = undefined;
-        selectableSlots = [];
-    }
 
     function onKeyDown(e: KeyboardEvent) {
         if (e.key === "Escape") {
-            selectedCard = undefined;
-            selectableSlots = [];
+            dispatch("cancelAction");
         }
+    }
+
+    function onSelectSlot(event: CustomEvent<FieldSlot>) {
+        selectSlotCallback?.(event.detail);
+        selectableSlots = [];
     }
 </script>
 
 <main class="w-full h-full flex flex-col items-center gap-16 m-5">
     <GameField inverted={true} />
-    <GameField {selectableSlots} {field} {graveyard} on:select={onSelectSlot} />
+    <GameField
+        {selectableSlots}
+        {field}
+        {graveyard}
+        on:select={onSelectSlot}
+    />
 </main>
 
 <section class="w-full h-full left-0 bottom-0 absolute pointer-events-none">
     <div class="w-full h-full absolute flex items-center">
         {#if selectedCard !== undefined}
             <div class="pointer-events-auto">
-                <IngameCard card={hand[selectedCard]} interactable={false} />
+                <IngameCard card={selectedCard} interactable={false} />
             </div>
         {/if}
     </div>
     <div class="w-full h-full absolute flex justify-center items-end">
-        <Hand {hand} {selectedCard} on:select={onSelectFromHand} />
+        <Hand
+            {hand}
+            on:select={(event) =>
+                dispatch("activateCard", { type: "hand", index: event.detail })}
+        />
     </div>
 </section>
 

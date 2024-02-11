@@ -1,6 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use mlua::{Function, UserData};
+use uuid::Uuid;
 
 use crate::{
     card::Card, card_storage::CardStorage, card_type::CardType, event_handler::EventHandler,
@@ -9,6 +10,7 @@ use crate::{
 
 pub struct Player {
     pub id: usize,
+    pub uuid: Uuid,
     pub hand: Mutex<Vec<Card>>,
     pub deck: Mutex<Vec<CardType>>,
     pub field: Mutex<Field>,
@@ -22,12 +24,14 @@ unsafe impl Sync for Player {}
 impl Player {
     pub fn new(
         id: usize,
+        uuid: Uuid,
         event_handler: Arc<Box<dyn EventHandler + Send + Sync>>,
         card_storage: Arc<CardStorage>,
         deck: Vec<CardType>,
     ) -> Self {
         Self {
             id,
+            uuid,
             event_handler,
             card_storage,
             hand: Mutex::new(Vec::new()),
@@ -83,10 +87,15 @@ impl UserData for Player {
             },
         );
 
-        methods.add_async_method("select_slot", |_, this, callback: Function| async move {
+        methods.add_async_method("select_slot", |_, this, (slots, callback): (Vec::<String>, Function)| async move {
+            let slots: Result<Vec<FieldSlot>, _> = slots
+                .iter()
+                .map(|slot| FieldSlot::try_from(slot.as_str()))
+                .collect();
+
             let slot = this
                 .event_handler
-                .select_slot(&this)
+                .select_slot(&this, slots?)
                 .await
                 .map_err(|err| mlua::Error::external(err.to_string()))?;
             callback.call::<FieldSlot, _>(slot)?;

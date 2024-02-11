@@ -7,5 +7,5 @@ pub(crate) mod debug;
 
 #[async_trait]
 pub trait EventHandler {
-    async fn select_slot(&self, player: &Player) -> anyhow::Result<FieldSlot>;
+    async fn select_slot(&self, player: &Player, slots: Vec<FieldSlot>) -> anyhow::Result<FieldSlot>;
 }

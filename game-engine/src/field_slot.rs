@@ -1,6 +1,7 @@
 use mlua::{FromLua, IntoLua, Lua, Value};
+use serde::{Serialize, Serializer};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum FieldSlot {
     Yokai1,
     Yokai2,
@@ -12,8 +13,16 @@ pub enum FieldSlot {
     Enchantment,
 }
 
+impl Serialize for FieldSlot {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer {
+        serializer.serialize_str(self.to_str())
+    }
+}
+
 impl FieldSlot {
-    fn to_str(&self) -> &'static str {
+    pub fn to_str(&self) -> &'static str {
         match self {
             FieldSlot::Yokai1 => "yokai-1",
             FieldSlot::Yokai2 => "yokai-2",
@@ -24,6 +33,10 @@ impl FieldSlot {
             FieldSlot::Terrain => "terrain",
             FieldSlot::Enchantment => "enchantment",
         }
+    }
+
+    pub fn to_string(&self) -> String {
+        self.to_str().to_string()
     }
 }
 

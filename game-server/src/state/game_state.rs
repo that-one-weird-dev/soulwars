@@ -11,9 +11,6 @@ pub struct GameState {
     game_store: RwLock<GameStore>,
 }
 
-unsafe impl Send for GameState {}
-unsafe impl Sync for GameState {}
-
 impl GameState {
     pub fn create_game(&self, id: Uuid, game: GameEngine) {
         self.games_mut().insert_game(id, game);

@@ -4,7 +4,6 @@
     import IngameCard from "./IngameCard.svelte";
 
     export let hand: GameCard[];
-    export let selectedCard: number | undefined;
 
     const dispatch = createEventDispatcher<{ select: number }>();
 
@@ -29,7 +28,6 @@
     }}
 >
     {#each hand as card, i}
-        {#if i !== selectedCard}
             {@const scale = i === hoverCardIndex ? 1.2 : 1}
 
             <div
@@ -52,6 +50,5 @@
                     />
                 </div>
             </div>
-        {/if}
     {/each}
 </div>

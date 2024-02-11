@@ -32,7 +32,11 @@ export async function handleConnection(socket: TypedSocket) {
     });
 }
 
-async function handleGameStart(socket: TypedSocket, userId: string, deck: number[]) {
+async function handleGameStart(
+    socket: TypedSocket,
+    userId: string,
+    deck: number[],
+) {
     const gameServerSocket = io(env.GAME_SERVER_URL, {
         auth: {
             userId: userId,
@@ -42,33 +46,52 @@ async function handleGameStart(socket: TypedSocket, userId: string, deck: number
         transports: ["websocket"],
     });
 
+    socket.on("disconnect", () => {
+        console.log("client disconnected");
+        gameServerSocket.disconnect();
+    });
+
     gameServerSocket.on("connect", () => {
         console.log("connected to game server");
     });
 
-    gameServerSocket.onAny(async (event, ...args) => {
-        console.log(`game server sent ${event}`);
+    gameServerSocket.on("disconnect", () => {
+        console.log("disconnected to game server");
+        socket.disconnect();
+    });
 
+    gameServerSocket.onAny((event, ...args) => {
         const lastArg = args[args.length - 1];
         if (lastArg instanceof Function) {
-            const response = await socket.emitWithAck(event, ...(args.toSpliced(args.length - 1, 1)));
-            console.log(`client responded to ${event} with ${response}`);
+            console.log(`game server sent ${event} with ack`);
+            socket
+                .emitWithAck(event, ...args.toSpliced(args.length - 1, 1))
+                .then((response) => {
+                    console.log(
+                        `client responded to ${event} with ${response}`,
+                    );
 
-            lastArg(response);
+                    lastArg(response);
+                });
         } else {
             socket.emit(event, ...args);
         }
     });
 
-    socket.onAny(async (event, ...args) => {
+    socket.onAny((event, ...args) => {
+        console.log(`client sent ${event} with ack`);
+
         const lastArg = args[args.length - 1];
         if (lastArg instanceof Function) {
-            console.log(`emitting ${event} with ack`)
-            const response = await gameServerSocket.emitWithAck(event, ...(args.toSpliced(args.length - 1, 1)));
-
-            lastArg(response);
+            gameServerSocket
+                .emitWithAck(event, ...args.toSpliced(args.length - 1, 1))
+                .then((response) => {
+                    console.log(
+                        `server responded to ${event} with ${response}`,
+                    );
+                    lastArg(response);
+                });
         } else {
-            console.log(`emitting ${event}`);
             gameServerSocket.emit(event, ...args);
         }
     });

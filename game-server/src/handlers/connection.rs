@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use crate::{
     engine::server_event_handler::ServerEventHandler,
-    handlers::info::{self},
+    handlers::{info::{self}, game},
     state::{
         game_state::GameState,
         partial_game_state::{PartialGame, PartialGameState},
@@ -80,6 +80,7 @@ pub fn handle_connection(
     }
 
     s.on("info:hand", info::hand);
+    s.on("game:activate", game::activate);
 
     let game_id = user_state.game_id.clone();
     s.on_disconnect(
@@ -87,7 +88,7 @@ pub fn handle_connection(
             let mut partial_games = partial_game_state.games.lock().unwrap();
             partial_games.remove(&game_id);
 
-            s.broadcast().emit("user left", ()).ok();
+            s.broadcast().emit("game:user_left", ()).ok();
         },
     );
 }
@@ -123,6 +124,8 @@ fn create_game(
     GameEngine::new(
         Box::new(event_handler),
         card_storage,
+        user1.user_id,
+        user2.user_id,
         user1.deck,
         user2.deck,
     )

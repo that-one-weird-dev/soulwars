@@ -26,6 +26,7 @@ impl EventHandler for DebugEventHandler {
     async fn select_slot(
         &self,
         _player: &crate::player::Player,
+        _slots: Vec<FieldSlot>,
     ) -> anyhow::Result<FieldSlot> {
         Ok(self.select_slot_value.clone())
     }

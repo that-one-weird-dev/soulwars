@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use mlua::{AsChunk, Lua, Table};
+use uuid::Uuid;
 
 use crate::{
     card_script::CardScript, card_storage::CardStorage, card_type::CardType,
@@ -27,13 +28,15 @@ impl GameEngine {
     pub fn new(
         event_handler: Box<dyn EventHandler + Send + Sync>,
         card_storage: CardStorage,
+        uuid_1: Uuid,
+        uuid_2: Uuid,
         deck_1: Vec<CardType>,
         deck_2: Vec<CardType>,
     ) -> anyhow::Result<Self> {
         let event_handler = Arc::new(event_handler);
         let card_storage = Arc::new(card_storage);
 
-        let game = Game::new(event_handler.clone(), card_storage.clone(), deck_1, deck_2);
+        let game = Game::new(event_handler.clone(), card_storage.clone(), uuid_1, uuid_2, deck_1, deck_2);
         let game = Arc::new(game);
 
         let lua = Lua::new();
@@ -107,6 +110,8 @@ impl GameEngine {
 
 #[cfg(test)]
 mod test {
+    use uuid::Uuid;
+
     use crate::{
         card::Card,
         card_data::{CardData, EnchantmentKind},
@@ -127,7 +132,7 @@ mod test {
             Card::new(1, CardData::enchantment(EnchantmentKind::Normal)),
         );
 
-        let engine = GameEngine::new(Box::new(event_handler), card_storage, vec![9], Vec::new())?;
+        let engine = GameEngine::new(Box::new(event_handler), card_storage, empty_uuid(), empty_uuid(), vec![9], Vec::new())?;
         engine.load_script(
             "test",
             r"
@@ -164,7 +169,7 @@ mod test {
             Card::new(1, CardData::enchantment(EnchantmentKind::Normal)),
         );
 
-        let engine = GameEngine::new(Box::new(event_handler), card_storage, vec![1], Vec::new())?;
+        let engine = GameEngine::new(Box::new(event_handler), card_storage, empty_uuid(), empty_uuid(), vec![1], Vec::new())?;
         engine.load_script(
             "test",
             r"
@@ -187,5 +192,9 @@ mod test {
         ));
 
         Ok(())
+    }
+
+    fn empty_uuid() -> Uuid {
+        Uuid::from_bytes([0; 16])
     }
 }

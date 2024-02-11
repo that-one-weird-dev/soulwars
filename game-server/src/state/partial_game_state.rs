@@ -15,5 +15,3 @@ pub struct PartialGameState {
     pub games: Mutex<HashMap<Uuid, PartialGame>>,
 }
 
-unsafe impl Send for PartialGameState {}
-unsafe impl Sync for PartialGameState {}

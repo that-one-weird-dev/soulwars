@@ -21,9 +21,6 @@ pub struct GameEngine {
     lua: Lua,
 }
 
-unsafe impl Send for GameEngine {}
-unsafe impl Sync for GameEngine {}
-
 impl GameEngine {
     pub fn new(
         event_handler: Box<dyn EventHandler + Send + Sync>,

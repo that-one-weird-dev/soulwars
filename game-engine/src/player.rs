@@ -19,8 +19,6 @@ pub struct Player {
     card_storage: Arc<CardStorage>,
 }
 
-unsafe impl Sync for Player {}
-
 impl Player {
     pub fn new(
         id: usize,
